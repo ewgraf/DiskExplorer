@@ -40,6 +40,8 @@
             this.button3 = new System.Windows.Forms.Button();
             this.buttonScan = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.button5 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
             this.buttonShowDuplicates = new System.Windows.Forms.Button();
             this.buttonHash = new System.Windows.Forms.Button();
             this.buttonLoad = new System.Windows.Forms.Button();
@@ -160,6 +162,8 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.button5);
+            this.groupBox2.Controls.Add(this.button4);
             this.groupBox2.Controls.Add(this.buttonShowDuplicates);
             this.groupBox2.Controls.Add(this.buttonHash);
             this.groupBox2.Controls.Add(this.buttonLoad);
@@ -173,6 +177,26 @@
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Analyze";
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(6, 78);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(75, 23);
+            this.button5.TabIndex = 14;
+            this.button5.Text = "button5";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(6, 49);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(75, 23);
+            this.button4.TabIndex = 13;
+            this.button4.Text = "button4";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // buttonShowDuplicates
             // 
@@ -255,6 +279,8 @@
 		private System.Windows.Forms.Button buttonLoad;
 		private System.Windows.Forms.Button buttonHash;
 		private System.Windows.Forms.Button buttonShowDuplicates;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
     }
 }
 
