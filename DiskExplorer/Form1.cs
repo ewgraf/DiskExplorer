@@ -432,5 +432,10 @@ namespace DiskExplorer
 				}).ToArray());
 			}
 		}
-	}
+
+        private void buttonSelectFiles_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
 }

@@ -1,4 +1,4 @@
-﻿using System.Windows.Forms;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace DiskExplorer
 {
@@ -6,13 +6,17 @@ namespace DiskExplorer
 	{
 		public static string SelectFolder()
 		{
-			using (var fbd = new FolderBrowserDialog())
-			{
-				DialogResult result = fbd.ShowDialog();
-				if (result == DialogResult.OK) {
-					return fbd.SelectedPath;
-				}
-			}
+            using (var ofd = new CommonOpenFileDialog()
+            {
+                Multiselect = false,
+                RestoreDirectory = true,
+                IsFolderPicker = true,
+                ShowHiddenItems = true
+            }) {
+                if (ofd.ShowDialog() == CommonFileDialogResult.Ok) {
+                    return ofd.FileName;
+                }
+            }
 			return null;
 		}
 	}
