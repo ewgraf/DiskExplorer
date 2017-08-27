@@ -10,7 +10,7 @@ namespace DiskExplorer
 {
     public partial class Form2 : Form
     {
-        private Dictionary<string, string> duplicates;
+        private Dictionary<string, List<FileInfoExtended>> duplicates;
         private string folder;
 
         // Шрифт
@@ -19,16 +19,17 @@ namespace DiskExplorer
 
         private Bitmap preview = null;
 
-        public Form2(Dictionary<string, string> d, string f)
+        public Form2(Dictionary<string, List<FileInfoExtended>> d, string f)
         {
             InitializeComponent();
+
             duplicates = d;
             folder = f;
             ColumnHeader[] columns = new ColumnHeader[4] { 
-                new ColumnHeader(0){ Text = "Имя",      Width = 120  },
-                new ColumnHeader(0){ Text = "Путь",     Width = 0   },
-                new ColumnHeader(0){ Text = "Размер",   Width = 70  },
-                new ColumnHeader(0){ Text = "Изменен",  Width = 150  }
+                new ColumnHeader(0){ Text = "Name",      Width = 120  },
+                new ColumnHeader(0){ Text = "Path",     Width = 0   },
+                new ColumnHeader(0){ Text = "Size",   Width = 70  },
+                new ColumnHeader(0){ Text = "Last write time",  Width = 150  }
             };
             listView1.Columns[1].Width = listView1.Width - listView1.Columns[0].Width - listView1.Columns[2].Width - listView1.Columns[3].Width - 21;
             listView1.Columns.Clear();
@@ -41,41 +42,31 @@ namespace DiskExplorer
         private void Form2_Load(object sender, EventArgs e)
         {
             label1.Text = folder;
-            //listView1.Sorting = SortOrder.Ascending;
-
-            string prevHash = string.Empty;
-            string currHash = string.Empty;
-            FileInfo info = null;
 
             bool coloriseGroup = true;
 
-            foreach (var item in duplicates)
+            foreach (var duplicate in duplicates)
             {
-                currHash = item.Value;
-                info = new FileInfo(item.Key);
-                ListViewItem item1 = new ListViewItem(new string[] { info.Name, item.Key/*.Replace(folder, "")*/, String.Format("{0:0.##} Mb", (info.Length / (1024d * 1024d))), info.LastWriteTime.ToString() });
-
-                if (currHash != prevHash)
-                    coloriseGroup = !coloriseGroup;
-                
-                if (item.Value == duplicates.First().Value)
-                    coloriseGroup = true;
-
-                if (coloriseGroup)
-                    item1.BackColor = SystemColors.Control;
-
-                    //item1.Checked = true;
-                //else
-                //    coloriseGroup = !coloriseGroup;
-                    //item1.Checked = false;
-                prevHash = currHash;
-                    
-
-                listView1.Items.Add(item1);
+                ListViewItem[] items = duplicate.Value.Select(f => {
+                    var item = new ListViewItem(
+                        new string[] {
+                            f.Name,
+                            f.Hash,
+                            f.SizeWithPrefix(),
+                            f.LastWriteTime.ToString()
+                        });
+                        if (coloriseGroup) {
+                            item.BackColor = SystemColors.Control;
+                        }
+                        return item;
+                    })
+                    .ToArray();
+                coloriseGroup = !coloriseGroup;                
+                listView1.Items.AddRange(items);                
             }
 
-            this.listView1.Focus();
-            this.listView1.Items[0].Selected = true;
+            listView1.Focus();
+            listView1.Items[0].Selected = true;
         }
 
         private void listView1_Resize(object sender, EventArgs e)
@@ -85,10 +76,8 @@ namespace DiskExplorer
 
         private void listView1_MouseClick(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
-            {
-                if (listView1.FocusedItem.Bounds.Contains(e.Location) == true)
-                {
+            if (e.Button == MouseButtons.Right) {
+                if (listView1.FocusedItem.Bounds.Contains(e.Location) == true) {
                     contextMenuStrip1.Show(Cursor.Position);
                 }
             }
@@ -107,20 +96,20 @@ namespace DiskExplorer
         private void listView1_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
             if(e.Item.Checked)
-                e.Item.Font = new System.Drawing.Font(fontName, fontSize, System.Drawing.FontStyle.Bold);
+                e.Item.Font = new Font(fontName, fontSize, FontStyle.Bold);
             else
-                e.Item.Font = new System.Drawing.Font(fontName, fontSize);
+                e.Item.Font = new Font(fontName, fontSize);
         }
 
         private void listView1_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
             string path = e.Item.SubItems[1].Text;
             if (
-                path.EndsWith(".jpg") ||
+                path.EndsWith(".jpg")  ||
                 path.EndsWith(".jpeg") || 
-                path.EndsWith(".png") || 
-                path.EndsWith(".gif") || 
-                path.EndsWith(".bmp") ||
+                path.EndsWith(".png")  || 
+                path.EndsWith(".gif")  || 
+                path.EndsWith(".bmp")  ||
                 path.EndsWith(".gif"))
                 preview = new Bitmap(e.Item.SubItems[1].Text);
             else
@@ -131,17 +120,15 @@ namespace DiskExplorer
         private void button1_Click(object sender, EventArgs e)
         {
             List<string> files = new List<string>();
-            foreach (ListViewItem item in listView1.Items)
-            {
-                if (item.Checked)
+            foreach (ListViewItem item in listView1.Items) {
+                if (item.Checked) {
                     files.Add(item.SubItems[1].Text);
+                }                    
             }
             preview.Dispose();
             pictureBox1.Image = null;
-            if (MessageBox.Show(String.Format("Вы хотите удалить {0} файлов?", files.Count), "Подтвержнение", MessageBoxButtons.YesNo) == DialogResult.Yes)
-            {
-                foreach (var item in files)
-                {
+            if (MessageBox.Show(String.Format("Вы хотите удалить {0} файлов?", files.Count), "Подтвержнение", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+                foreach (var item in files) {
                     File.Delete(item);
                 }
             }

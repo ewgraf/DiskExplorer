@@ -8,41 +8,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using System.Diagnostics;
+using System.Windows;
 
 namespace DiskExplorer
 {
 	public partial class Form1 : Form
 	{
-		public class FileInfoExtended
-		{
-			private FileInfo _fileInfo;
-			public string Name { get; set; }
-			public long Length { get; set; }
-			public string DirectoryName { get; set; }
-			public string FullPath { get; set; }
-			public string Hash { get; set; }
-
-			public FileInfoExtended() {} // for Json
-
-			public FileInfoExtended(string fileName)
-			{
-				_fileInfo = new FileInfo(fileName);
-				Name = _fileInfo.Name;
-				Length = _fileInfo.Length;
-				DirectoryName = _fileInfo.DirectoryName;
-				FullPath = Path.Combine(DirectoryName, Name);
-			}
-
-			public FileInfoExtended(FileInfoExtended info, string hash)
-			{
-				Name = info.Name;
-				Length = info.Length;
-				DirectoryName = info.DirectoryName;
-				FullPath = Path.Combine(DirectoryName, Name);
-				Hash = hash;
-			}
-		}
-
 		public class State
 		{
 			public string SelectedFolder = @"E:\Unsorted\С торрента";
@@ -52,13 +24,20 @@ namespace DiskExplorer
 		}
 
 		public static State _state = new State();
+        //public static PerformanceCounter _diskCounter = new PerformanceCounter("PhysicalDisk", "% Disk Time", "_Total");
 
-		public Form1()
+        public Form1()
 		{
 			InitializeComponent();
 
 			textBox1.Text = _state.SelectedFolder;
-		}
+            //toolStripStatusLabelDiskUsage.Text = $"Disk {Directory.GetDirectoryRoot(_state.SelectedFolder)} usage:";
+
+            //Task.Run(() => {
+            //    toolStripProgressBarDiskUsage.Value = (int)_diskCounter.NextValue();
+            //    Task.Delay(333);
+            //});
+        }
 
 		private Dictionary<string, long> dict = new Dictionary<string, long>();
 		ListViewColumnSorter sorter = new ListViewColumnSorter();
@@ -150,8 +129,8 @@ namespace DiskExplorer
 				result = 0;
 				return false;
 			}
-			if (SizePrefixes.Contains(values[1])) {
-				result = (long)(double.Parse(values[0]) * GetPrefixValue(values[1]));
+			if (FileUtils.SizeSuffixes.Contains(values[1])) {
+				result = (long)(double.Parse(values[0]) * FileUtils.GetPrefixValue(values[1]));
 				return true;
 			} else if (values[1] == "Bytes") {
 				result = 1;
@@ -220,40 +199,9 @@ namespace DiskExplorer
 			Process.Start(_state.SelectedFolder);
 		}
 
-		private static readonly string[] FilePrefixes = new[] { "kF", "MF", "GF", "TF" };
-		private static readonly string[] SizePrefixes = new[] { "kB", "MB", "GB", "TB" };
-		private enum PrefixType {
-			File,
-			Size
-		}
-		private string GetPrefix(double value, PrefixType type)
-		{
-			int prefixId = 0;
-			if(value < 1000d) {
-				return $"{value:#.#} Bytes";
-			}
-			while((value /= 1024) > 1000d) {
-				prefixId++;
-			}
-			return $"{value:#.#} {(type == PrefixType.File ? FilePrefixes[prefixId] : SizePrefixes[prefixId])}";
-        }
-
-        private static int GetPrefixValue(string value)
-		{
-			if(value.Length > 2) {
-				throw new ArgumentException("Prefix should be length on 2, at least at 20.08.2017 14:06 GMT+3");
-			}
-
-			int multiplier = 1024;
-			int prefixId = 0;
-			while (SizePrefixes[prefixId++] != value) {}
-			int result = (int)Math.Pow(multiplier, prefixId++);
-			return result;
-		}
-
 		private Task SetStripStatus(int length, double seconds, long totalSize)
 		{
-			toolStripStatusLabel1.Text = $"{length} files discovered in {seconds:#.###} seconds {GetPrefix(totalSize, PrefixType.Size)} discovered";
+			toolStripStatusLabel1.Text = $"{length} files discovered in {seconds:#.###} seconds {FileUtils.SizeSuffix(totalSize)} discovered";
 			return Task.CompletedTask;
 		}
 
@@ -266,11 +214,6 @@ namespace DiskExplorer
 		{
 			_state.CancellationTokenSource.Cancel();
 			toolStripSplitButtonCancel.Enabled = false;
-		}
-
-		private async void buttonScan_Click(object sender, EventArgs e)
-		{
-			
 		}
 
 		private void buttonSave_Click(object sender, EventArgs e)
@@ -287,7 +230,7 @@ namespace DiskExplorer
 			if(_state.FilesDiscovered != null) {
 				listView1.Items.AddRange(_state.FilesDiscovered.Select(f => {
 					ListViewItem item = new ListViewItem(f.Name);
-					item.SubItems.Add(GetPrefix(f.Length, PrefixType.Size));
+					item.SubItems.Add(FileUtils.SizeSuffix(f.Length));
 					item.SubItems.Add(f.DirectoryName);
 					item.SubItems.Add(f.FullPath);
 					item.SubItems.Add(f.Hash);
@@ -314,7 +257,7 @@ namespace DiskExplorer
 			if(_state.FilesDiscovered != null) {
 				listView1.Items.AddRange(_state.FilesDiscovered.Select(f => {
 					ListViewItem item = new ListViewItem(f.Name);
-					item.SubItems.Add(GetPrefix(f.Length, PrefixType.Size));
+					item.SubItems.Add(FileUtils.SizeSuffix(f.Length));
 					item.SubItems.Add(f.DirectoryName);
 					item.SubItems.Add(f.FullPath);
 					item.SubItems.Add(f.Hash);
@@ -323,108 +266,28 @@ namespace DiskExplorer
 			}
 		}
 
-		private void buttonShowDuplicates_Click(object sender, EventArgs e)
-		{
-			//listView1.Items.Clear();
-			//if (_state.FilesScanned != null) {
-			//	listView1.Items.AddRange(_state.FilesScanned
-			//		.GroupBy(item => item.Hash)
-			//		.Where(g => g.Count() > 1)
-			//		.SelectMany(g => g.ToArray())
-			//		.Select(f => {
-			//			ListViewItem item = new ListViewItem(f.Name);
-			//			item.SubItems.Add(GetPrefix(f.Length, PrefixType.Size));
-			//			item.SubItems.Add(f.DirectoryName);
-			//			item.SubItems.Add(f.FullPath);
-			//			item.SubItems.Add(f.Hash);
-			//			return item;
-			//	}).ToArray());
-			//}
-		}
-
-        private void buttonSelectFiles_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private async void button4_Click(object sender, EventArgs e)
         {
-            //long size = Common.GetDirectorySize(_state.SelectedFolder);
-
-            int milestoneShift = _state.FilesDiscovered.Length / 1000;
-
-            Dictionary<string, List<string>> fileByHash = await Task.Run(() => {
-                return _state.FilesDiscovered
-                    .Select((fileInfo, index) => {
-                        if (index % milestoneShift == 0) { toolStripStatusLabel1.Text = $"{index} / {_state.FilesDiscovered.Length}"; }
-                        return new { FileInfo = fileInfo, Hash = /*Hash.SuperFastHashUnsafeFile(filePath) */ Hash.GetFileHash(fileInfo.FullPath) };
-                    })
-                    .GroupBy(g => g.Hash)
-                    .ToDictionary(g => g.Key, g => g.Select(p => p.FileInfo.FullPath).ToList());
-            });
-            
-            var duplicates = fileByHash.Where(p => p.Value.Count > 1);
-
-            string scanResultsPath = Path.Combine(Directory.GetParent(_state.SelectedFolder).ToString(), Path.GetFileName(_state.SelectedFolder) + "-duplecates.txt");
-            // Path.GetFolderName(selectedFolder) on D:\\Новая папка returns D:\\ therefore use Path.GetFileName(selectedFolder)
-            
-            using (var file = new StreamWriter(scanResultsPath)) {
-                file.WriteLine(_state.SelectedFolder + @"\*");
-                foreach (var pair in duplicates) {
-                    foreach (var path in pair.Value) {
-                        file.WriteLine(pair.Key + "@" + path);
-                    }
-                }
-            }
-
-            List<string> hashAndPathes = File.ReadAllLines(scanResultsPath).ToList();
-
-            string folder = hashAndPathes[0];
-            hashAndPathes.RemoveAt(0);
-
-            Dictionary<string, string> d = new Dictionary<string, string>();
-            foreach (var line in hashAndPathes) {
-                string[] split = line.Split(new char[] { '@' }, 2);
-                string hash = split[0];
-                string path = split[1];
-                d.Add(path, hash);
-            }
-
-            new Form2(d, folder).Show();
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog o = new OpenFileDialog();
-            o.Multiselect = false;
-            o.Filter = "Дубликаты (duplecates.txt)|*.txt|Все файлы (*.*)|*.*";
-
-            List<string> hashAndPathes = new List<string>();
-
-            if (o.ShowDialog() == DialogResult.OK)
-            {
-                hashAndPathes = File.ReadAllLines(o.FileName).ToList();
-            }
-            else
-            {
-                MessageBox.Show(o.ShowDialog().ToString());
-                return;
-            }
-
-            string folder = hashAndPathes[0];
-            hashAndPathes.RemoveAt(0);
-
-            Dictionary<string, string> duplicates = new Dictionary<string, string>();
-            foreach (var line in hashAndPathes)
-            {
-                string[] split = line.Split(new char[] { '@' }, 2);
-                string hash = split[0];
-                string path = split[1];
-                duplicates.Add(path, hash);
-            }
-
-            Form2 f2 = new Form2(duplicates, folder);
-            f2.Show();
+            //string scanResultsPath = Path.Combine(Directory.GetParent(_state.SelectedFolder).ToString(), Path.GetFileName(_state.SelectedFolder) + "-duplecates.txt");
+            //// Path.GetFolderName(selectedFolder) on D:\\Новая папка returns D:\\ therefore use Path.GetFileName(selectedFolder)            
+            //using (var file = new StreamWriter(scanResultsPath)) {
+            //    file.WriteLine(_state.SelectedFolder + @"\*");
+            //    foreach (var pair in duplicates) {
+            //        foreach (var path in pair.Value) {
+            //            file.WriteLine(pair.Key + "@" + path);
+            //        }
+            //    }
+            //}
+            //List<string> hashAndPathes = File.ReadAllLines(scanResultsPath).ToList();
+            //string folder = hashAndPathes[0];
+            //hashAndPathes.RemoveAt(0);
+            //Dictionary<string, string> d = new Dictionary<string, string>();
+            //foreach (var line in hashAndPathes) {
+            //    string[] split = line.Split(new char[] { '@' }, 2);
+            //    string hash = split[0];
+            //    string path = split[1];
+            //    d.Add(path, hash);
+            //}
         }
 
         private async void buttonDiscover_Click(object sender, EventArgs e)
@@ -448,7 +311,7 @@ namespace DiskExplorer
                                 elapsedSeconds = 1;
                             }
                             double rate = value.Item1 / elapsedSeconds;
-                            toolStripStatusLabel1.Text = $"{_state.SelectedFolder} {value.Item1} files discovered... {rate} files/second {GetPrefix(totalFilesSize, PrefixType.Size)} discovered so far...";
+                            toolStripStatusLabel1.Text = $"{_state.SelectedFolder} {value.Item1} files discovered... {rate} files/second {FileUtils.SizeSuffix(totalFilesSize)} discovered so far...";
                         }
                     }),
                     _state.CancellationTokenSource
@@ -460,7 +323,7 @@ namespace DiskExplorer
 
             listView1.Items.AddRange(_state.FilesDiscovered.Select(f => {
                 var item = new ListViewItem(f.Name);
-                item.SubItems.Add(GetPrefix(f.Length, PrefixType.Size));
+                item.SubItems.Add(FileUtils.SizeSuffix(f.Length));
                 item.SubItems.Add(f.DirectoryName);
                 item.SubItems.Add(f.FullPath);
                 item.SubItems.Add(f.Hash);
@@ -468,6 +331,17 @@ namespace DiskExplorer
             }).ToArray());
 
             await SetStripStatus(_state.FilesDiscovered.Length, elapsedSeconds, _state.FilesDiscovered.Sum(f => f.Length));
+        }
+
+        private async void buttonFindDuplicates_Click(object sender, EventArgs e)
+        {
+            Dictionary<string, List<FileInfoExtended>> duplicates = _state.FilesDiscovered
+                .GroupBy(g => g.Hash)
+                .ToDictionary(g => g.Key, g => g.ToList())
+                .Where(p => p.Value.Count > 1)
+                .ToDictionary(g => g.Key, g => g.Value);
+
+            new Form2(duplicates, _state.SelectedFolder).Show();
         }
     }
 }
