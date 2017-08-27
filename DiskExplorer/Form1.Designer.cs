@@ -37,8 +37,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.buttonScan = new System.Windows.Forms.Button();
+            this.buttonDiscover = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.button5 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
@@ -137,25 +136,15 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // button3
+            // buttonDiscover
             // 
-            this.button3.Location = new System.Drawing.Point(6, 19);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(105, 24);
-            this.button3.TabIndex = 7;
-            this.button3.Text = "Discover files";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
-            // 
-            // buttonScan
-            // 
-            this.buttonScan.Location = new System.Drawing.Point(117, 19);
-            this.buttonScan.Name = "buttonScan";
-            this.buttonScan.Size = new System.Drawing.Size(190, 24);
-            this.buttonScan.TabIndex = 8;
-            this.buttonScan.Text = "Scan files (gather file info)";
-            this.buttonScan.UseVisualStyleBackColor = true;
-            this.buttonScan.Click += new System.EventHandler(this.buttonScan_Click);
+            this.buttonDiscover.Location = new System.Drawing.Point(6, 19);
+            this.buttonDiscover.Name = "buttonDiscover";
+            this.buttonDiscover.Size = new System.Drawing.Size(105, 24);
+            this.buttonDiscover.TabIndex = 7;
+            this.buttonDiscover.Text = "Discover files";
+            this.buttonDiscover.UseVisualStyleBackColor = true;
+            this.buttonDiscover.Click += new System.EventHandler(this.buttonDiscover_Click);
             // 
             // groupBox2
             // 
@@ -168,8 +157,7 @@
             this.groupBox2.Controls.Add(this.buttonHash);
             this.groupBox2.Controls.Add(this.buttonLoad);
             this.groupBox2.Controls.Add(this.buttonSave);
-            this.groupBox2.Controls.Add(this.button3);
-            this.groupBox2.Controls.Add(this.buttonScan);
+            this.groupBox2.Controls.Add(this.buttonDiscover);
             this.groupBox2.Controls.Add(this.listView1);
             this.groupBox2.Location = new System.Drawing.Point(12, 67);
             this.groupBox2.Name = "groupBox2";
@@ -271,8 +259,7 @@
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.Button button2;
-		private System.Windows.Forms.Button button3;
-		private System.Windows.Forms.Button buttonScan;
+		private System.Windows.Forms.Button buttonDiscover;
 		private System.Windows.Forms.ToolStripSplitButton toolStripSplitButtonCancel;
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.Button buttonSave;

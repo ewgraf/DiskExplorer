@@ -45,9 +45,8 @@ namespace DiskExplorer
 
 		public class State
 		{
-			public string SelectedFolder = @"E:\Unsorted\Downloads";
-			public string[] FilesDiscovered;
-			public FileInfoExtended[] FilesScanned;
+			public string SelectedFolder = @"E:\Unsorted\С торрента";
+			public FileInfoExtended[] FilesDiscovered;
 			[JsonIgnore]
 			public CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 		}
@@ -120,39 +119,28 @@ namespace DiskExplorer
 			}
 		}
 
-		static string[] GetFiles(string path, IProgress<int> progress = null, CancellationTokenSource token = null)
+		private static IEnumerable<FileInfoExtended> GetFiles(string path, IProgress<(int, long)> progress = null, CancellationTokenSource token = null)
 		{
-			List<string> files = GetFilesOrDefault(path).ToList();
-			List<string> directories = GetDirectoriesOrDefault(path).ToList();
-			for (int i = 0; i < directories.Count && (!token?.IsCancellationRequested ?? true); i++) {
+            int filesDiscovered = 0;
+            long filesSizeDiscovered = 0;
+            List<string> directories = new[] { path }.ToList();
+            for (int i = 0; i < directories.Count && (!token?.IsCancellationRequested ?? true); i++) {
 				string directory = directories[i];
-				string[] dirFiles = GetFilesOrDefault(directory);
-				files.AddRange(dirFiles);
+                foreach (FileInfoExtended fileInfo in GetFilesOrDefault(directory).Select(f => new FileInfoExtended(f))) {
+                    if (fileInfo.FullPath.Length > 260) { // MAX_PATH = 260, Windows OS since 2000.XP,2003
+                        throw new ArgumentException($"Path '{path}' is too long to be handle by your OS. Consined doing something to reduce length.");
+                    }
+                    filesDiscovered++;
+                    filesSizeDiscovered += fileInfo.Length;
+                    yield return fileInfo;
+                }
 				string[] dirDirectories = GetDirectoriesOrDefault(directory);
 				directories.AddRange(dirDirectories);
-				if (files.Count % 1000 == 0) {
-					progress.Report(files.Count);
-				}
-			}
-			foreach (string filePath in files) {
-				if (filePath.Length > 260) { // MAX_PATH = 260, Windows OS since 2000.XP,2003
-					throw new ArgumentException($"Path '{path}' is too long to be handle by your OS. Consined doing something to reduce length.");
-				}
-			}
-			return files.ToArray();
-		}
 
-		static FileInfoExtended[] GetFileInfos(string[] pathes, IProgress<int> progress = null, CancellationTokenSource token = null)
-		{
-			var fileInfos = new List<FileInfoExtended>();
-			for (int i = 0; i < pathes.Length && (!token?.IsCancellationRequested ?? true); i++) {
-				var path = pathes[i];
-				fileInfos.Add(new FileInfoExtended(path));
-				if (fileInfos.Count % 1000 == 0) {
-					progress.Report(fileInfos.Count);
-				}
-			}
-			return fileInfos.ToArray();
+                if (filesDiscovered % 1000 == 0) {
+                    progress.Report((filesDiscovered, filesSizeDiscovered));
+                }
+            }
 		}
 
 		public static bool TryParseFileSize(string value, out long result)
@@ -232,41 +220,6 @@ namespace DiskExplorer
 			Process.Start(_state.SelectedFolder);
 		}
 
-		private async void button3_Click(object sender, EventArgs e)
-		{
-			listView1.Items.Clear();
-			(listView1.ListViewItemSorter as ListViewColumnSorter).SortColumn = 0;
-
-			var stopwatch = new Stopwatch();
-			stopwatch.Start();
-			double elapsedSeconds = 0;
-			toolStripSplitButtonCancel.Enabled = true;
-			_state.CancellationTokenSource = new CancellationTokenSource();
-			_state.FilesDiscovered = await Task.Run(() => GetFiles(
-				_state.SelectedFolder,
-				new Progress<int>(value => {
-					lock (_lock) {
-						elapsedSeconds = stopwatch.Elapsed.TotalMilliseconds / 1000d;
-						if (elapsedSeconds == 0) {
-							elapsedSeconds = 1;
-						}
-						double rate = value / elapsedSeconds;
-						toolStripStatusLabel1.Text = $"{_state.SelectedFolder} {value} files discovered... {GetPrefix(rate, PrefixType.File)} files/second";
-					}
-				}),
-				_state.CancellationTokenSource
-			));
-
-			stopwatch.Stop();
-			elapsedSeconds = stopwatch.Elapsed.TotalMilliseconds / 1000d;
-
-			//ListViewItem name = new ListViewItem(Path.GetFileName(kvp.Key));
-			//name.SubItems.Add((kvp.Value / (1024 * 1024)) + " MB");
-			
-			listView1.Items.AddRange(_state.FilesDiscovered.Select(f => new ListViewItem(f)).ToArray());
-			await SetStripStatus(_state.FilesDiscovered.Length, elapsedSeconds);
-		}
-
 		private static readonly string[] FilePrefixes = new[] { "kF", "MF", "GF", "TF" };
 		private static readonly string[] SizePrefixes = new[] { "kB", "MB", "GB", "TB" };
 		private enum PrefixType {
@@ -283,9 +236,9 @@ namespace DiskExplorer
 				prefixId++;
 			}
 			return $"{value:#.#} {(type == PrefixType.File ? FilePrefixes[prefixId] : SizePrefixes[prefixId])}";
-		}
+        }
 
-		private static int GetPrefixValue(string value)
+        private static int GetPrefixValue(string value)
 		{
 			if(value.Length > 2) {
 				throw new ArgumentException("Prefix should be length on 2, at least at 20.08.2017 14:06 GMT+3");
@@ -298,9 +251,9 @@ namespace DiskExplorer
 			return result;
 		}
 
-		private Task SetStripStatus(int length, double seconds)
+		private Task SetStripStatus(int length, double seconds, long totalSize)
 		{
-			toolStripStatusLabel1.Text = $"{length} files discovered in {seconds:#.###} seconds";
+			toolStripStatusLabel1.Text = $"{length} files discovered in {seconds:#.###} seconds {GetPrefix(totalSize, PrefixType.Size)} discovered";
 			return Task.CompletedTask;
 		}
 
@@ -317,46 +270,7 @@ namespace DiskExplorer
 
 		private async void buttonScan_Click(object sender, EventArgs e)
 		{
-			listView1.Items.Clear();
-			(listView1.ListViewItemSorter as ListViewColumnSorter).SortColumn = 0;
-
-			var stopwatch = new Stopwatch();
-			stopwatch.Start();
-			double elapsedSeconds = 0;
-			toolStripSplitButtonCancel.Enabled = true;
-			_state.CancellationTokenSource = new CancellationTokenSource();
-			_state.FilesScanned = await Task.Run(() => GetFileInfos(
-				_state.FilesDiscovered,
-				new Progress<int>(value => {
-					lock (_lock)
-					{
-						elapsedSeconds = stopwatch.Elapsed.TotalMilliseconds / 1000d;
-						if (elapsedSeconds == 0) {
-							elapsedSeconds = 1;
-						}
-						double rate = value / elapsedSeconds;
-						toolStripStatusLabel1.Text = $"{_state.SelectedFolder} {value} files scanned... {GetPrefix(rate, PrefixType.File)} files/second";
-					}
-				}),
-				_state.CancellationTokenSource
-			));
-
-			stopwatch.Stop();
-			elapsedSeconds = stopwatch.Elapsed.TotalMilliseconds / 1000d;
-
-			//ListViewItem name = new ListViewItem(Path.GetFileName(kvp.Key));
-			//name.SubItems.Add((kvp.Value / (1024 * 1024)) + " MB");
-
-			listView1.Items.Clear();
-			listView1.Items.AddRange(_state.FilesScanned.Select(f => {
-				ListViewItem item = new ListViewItem(f.Name);
-				item.SubItems.Add(GetPrefix(f.Length, PrefixType.Size));
-				item.SubItems.Add(f.DirectoryName);
-				item.SubItems.Add(f.FullPath);
-				item.SubItems.Add(f.Hash);
-				return item;
-			}).ToArray());
-			await SetStripStatus(_state.FilesScanned.Length, elapsedSeconds);
+			
 		}
 
 		private void buttonSave_Click(object sender, EventArgs e)
@@ -370,8 +284,8 @@ namespace DiskExplorer
 
 			textBox1.Text = _state.SelectedFolder;
 			listView1.Items.Clear();
-			if(_state.FilesScanned != null) {
-				listView1.Items.AddRange(_state.FilesScanned.Select(f => {
+			if(_state.FilesDiscovered != null) {
+				listView1.Items.AddRange(_state.FilesDiscovered.Select(f => {
 					ListViewItem item = new ListViewItem(f.Name);
 					item.SubItems.Add(GetPrefix(f.Length, PrefixType.Size));
 					item.SubItems.Add(f.DirectoryName);
@@ -379,8 +293,6 @@ namespace DiskExplorer
 					item.SubItems.Add(f.Hash);
 					return item;
 				}).ToArray());
-			} else if (_state.FilesDiscovered != null) {
-				listView1.Items.AddRange(_state.FilesDiscovered.Select(f => new ListViewItem(f)).ToArray());
 			}
 		}
 
@@ -388,19 +300,19 @@ namespace DiskExplorer
 		{
 			await Task.Run(() => {
 				int index = 0;
-				_state.FilesScanned = _state.FilesScanned.AsParallel().Select(f => {
+				_state.FilesDiscovered = _state.FilesDiscovered.AsParallel().Select(f => {
 					if (index++ % 10 == 0) {
 						lock(_lock) {
-							toolStripStatusLabel1.Text = $"{index} / {_state.FilesScanned.Length} hashed";
+							toolStripStatusLabel1.Text = $"{index} / {_state.FilesDiscovered.Length} hashed";
 						}
 					}
 					return new FileInfoExtended(f, Hash.GetFileHash(f.FullPath));
 				}).ToArray();
 			});
-			toolStripStatusLabel1.Text = $"{_state.FilesScanned.Length} files hashed";
+			toolStripStatusLabel1.Text = $"{_state.FilesDiscovered.Length} files hashed";
 			listView1.Items.Clear();
-			if(_state.FilesScanned != null) {
-				listView1.Items.AddRange(_state.FilesScanned.Select(f => {
+			if(_state.FilesDiscovered != null) {
+				listView1.Items.AddRange(_state.FilesDiscovered.Select(f => {
 					ListViewItem item = new ListViewItem(f.Name);
 					item.SubItems.Add(GetPrefix(f.Length, PrefixType.Size));
 					item.SubItems.Add(f.DirectoryName);
@@ -408,8 +320,6 @@ namespace DiskExplorer
 					item.SubItems.Add(f.Hash);
 					return item;
 				}).ToArray());
-			} else if (_state.FilesDiscovered != null) {
-				listView1.Items.AddRange(_state.FilesDiscovered.Select(f => new ListViewItem(f)).ToArray());
 			}
 		}
 
@@ -430,7 +340,6 @@ namespace DiskExplorer
 			//			return item;
 			//	}).ToArray());
 			//}
-
 		}
 
         private void buttonSelectFiles_Click(object sender, EventArgs e)
@@ -446,12 +355,12 @@ namespace DiskExplorer
 
             Dictionary<string, List<string>> fileByHash = await Task.Run(() => {
                 return _state.FilesDiscovered
-                    .Select((filePath, index) => {
+                    .Select((fileInfo, index) => {
                         if (index % milestoneShift == 0) { toolStripStatusLabel1.Text = $"{index} / {_state.FilesDiscovered.Length}"; }
-                        return new { FilePath = filePath, Hash = /*Hash.SuperFastHashUnsafeFile(filePath) */ Hash.GetFileHash(filePath) };
+                        return new { FileInfo = fileInfo, Hash = /*Hash.SuperFastHashUnsafeFile(filePath) */ Hash.GetFileHash(fileInfo.FullPath) };
                     })
                     .GroupBy(g => g.Hash)
-                    .ToDictionary(g => g.Key, g => g.Select(p => p.FilePath).ToList());
+                    .ToDictionary(g => g.Key, g => g.Select(p => p.FileInfo.FullPath).ToList());
             });
             
             var duplicates = fileByHash.Where(p => p.Value.Count > 1);
@@ -516,6 +425,49 @@ namespace DiskExplorer
 
             Form2 f2 = new Form2(duplicates, folder);
             f2.Show();
+        }
+
+        private async void buttonDiscover_Click(object sender, EventArgs e)
+        {
+            listView1.Items.Clear();
+            (listView1.ListViewItemSorter as ListViewColumnSorter).SortColumn = 0;
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            double elapsedSeconds = 0;
+            long totalFilesSize = 0;
+            toolStripSplitButtonCancel.Enabled = true;
+            _state.CancellationTokenSource = new CancellationTokenSource();
+
+            _state.FilesDiscovered = await Task.Run(() => GetFiles(_state.SelectedFolder,
+                    new Progress<(int, long)>(value => {
+                        totalFilesSize = value.Item2;
+                        lock (_lock) {
+                            elapsedSeconds = stopwatch.Elapsed.TotalMilliseconds / 1000d;
+                            if (elapsedSeconds == 0) {
+                                elapsedSeconds = 1;
+                            }
+                            double rate = value.Item1 / elapsedSeconds;
+                            toolStripStatusLabel1.Text = $"{_state.SelectedFolder} {value.Item1} files discovered... {rate} files/second {GetPrefix(totalFilesSize, PrefixType.Size)} discovered so far...";
+                        }
+                    }),
+                    _state.CancellationTokenSource
+                )
+                .ToArray());
+
+            stopwatch.Stop();
+            elapsedSeconds = stopwatch.Elapsed.TotalMilliseconds / 1000d;
+
+            listView1.Items.AddRange(_state.FilesDiscovered.Select(f => {
+                var item = new ListViewItem(f.Name);
+                item.SubItems.Add(GetPrefix(f.Length, PrefixType.Size));
+                item.SubItems.Add(f.DirectoryName);
+                item.SubItems.Add(f.FullPath);
+                item.SubItems.Add(f.Hash);
+                return item;
+            }).ToArray());
+
+            await SetStripStatus(_state.FilesDiscovered.Length, elapsedSeconds, _state.FilesDiscovered.Sum(f => f.Length));
         }
     }
 }
