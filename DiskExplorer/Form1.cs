@@ -8,8 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
-using System.Diagnostics;
-using System.Windows;
 
 namespace DiskExplorer
 {
@@ -24,23 +22,13 @@ namespace DiskExplorer
 		}
 
 		public static State _state = new State();
-        //public static PerformanceCounter _diskCounter = new PerformanceCounter("PhysicalDisk", "% Disk Time", "_Total");
+        public static object _lock = new object();
+        private ListViewColumnSorter sorter = new ListViewColumnSorter();
 
         public Form1()
 		{
 			InitializeComponent();
-
-			textBox1.Text = _state.SelectedFolder;
-            //toolStripStatusLabelDiskUsage.Text = $"Disk {Directory.GetDirectoryRoot(_state.SelectedFolder)} usage:";
-
-            //Task.Run(() => {
-            //    toolStripProgressBarDiskUsage.Value = (int)_diskCounter.NextValue();
-            //    Task.Delay(333);
-            //});
         }
-
-		private Dictionary<string, long> dict = new Dictionary<string, long>();
-		ListViewColumnSorter sorter = new ListViewColumnSorter();
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
@@ -53,8 +41,11 @@ namespace DiskExplorer
 			listView1.Columns.Add("Full path").Width = 500;
 			listView1.Columns.Add("Hash").Width = 400;
 
-			this.listView1.ListViewItemSorter = sorter;
-		}
+			listView1.ListViewItemSorter = sorter;
+
+            LoadState();
+            SetMainForm();
+        }
 
 		static long GetDirectorySize(string path)
 		{
@@ -186,8 +177,6 @@ namespace DiskExplorer
 			//}
 		}
 
-		object _lock = new object();
-
 		private void button1_Click(object sender, EventArgs e)
 		{
 			_state.SelectedFolder = OSHelper.SelectFolder();
@@ -225,46 +214,79 @@ namespace DiskExplorer
 		{
 			_state = JsonConvert.DeserializeObject<State>(File.ReadAllText("analysis.json"));
 
-			textBox1.Text = _state.SelectedFolder;
-			listView1.Items.Clear();
-			if(_state.FilesDiscovered != null) {
-				listView1.Items.AddRange(_state.FilesDiscovered.Select(f => {
-					ListViewItem item = new ListViewItem(f.Name);
-					item.SubItems.Add(FileUtils.SizeSuffix(f.Length));
-					item.SubItems.Add(f.DirectoryName);
-					item.SubItems.Add(f.FullPath);
-					item.SubItems.Add(f.Hash);
-					return item;
-				}).ToArray());
-			}
+            SetMainForm();
+        }
+
+        private async Task<FileInfoExtended[]> ComputeHashes(FileInfoExtended[] files, IProgress<int> progress = null)
+        {
+            int index = 0;
+            return files
+                .AsParallel()
+                .Select(f => {
+                    if (++index % 10 == 0) {
+                        progress.Report(index);
+                    }
+                    return new FileInfoExtended(f, Hash.GetFileHash(f.FullPath));
+                    //return new FileInfoExtended(f, Hash.SuperFastHashUnsafeFile(f.FullPath));
+                })
+                .ToArray();
+        }
+
+        private async void buttonHash_Click(object sender, EventArgs e)
+		{
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            _state.FilesDiscovered = await Task.Run(() => 
+                ComputeHashes(_state.FilesDiscovered,
+                    new Progress<int>(index => {
+                        toolStripStatusLabel1.Text = $"{index} / {_state.FilesDiscovered.Length} hashes";
+                    })
+                )
+            );
+            stopwatch.Stop();
+
+            toolStripStatusLabel1.Text = $"{_state.FilesDiscovered.Length} files hashed in {stopwatch.Elapsed.TotalSeconds} seconds";
+
+            SetListView();
+            SaveState();
 		}
 
-		private async void buttonHash_Click(object sender, EventArgs e)
-		{
-			await Task.Run(() => {
-				int index = 0;
-				_state.FilesDiscovered = _state.FilesDiscovered.AsParallel().Select(f => {
-					if (index++ % 10 == 0) {
-						lock(_lock) {
-							toolStripStatusLabel1.Text = $"{index} / {_state.FilesDiscovered.Length} hashed";
-						}
-					}
-					return new FileInfoExtended(f, Hash.GetFileHash(f.FullPath));
-				}).ToArray();
-			});
-			toolStripStatusLabel1.Text = $"{_state.FilesDiscovered.Length} files hashed";
-			listView1.Items.Clear();
-			if(_state.FilesDiscovered != null) {
-				listView1.Items.AddRange(_state.FilesDiscovered.Select(f => {
-					ListViewItem item = new ListViewItem(f.Name);
-					item.SubItems.Add(FileUtils.SizeSuffix(f.Length));
-					item.SubItems.Add(f.DirectoryName);
-					item.SubItems.Add(f.FullPath);
-					item.SubItems.Add(f.Hash);
-					return item;
-				}).ToArray());
-			}
-		}
+        private void SaveState()
+        {
+            File.WriteAllText("analysis.json", JsonConvert.SerializeObject(_state));
+        }
+
+        private void LoadState()
+        {
+            if (File.Exists("analysis.json")) {
+                _state = JsonConvert.DeserializeObject<State>(File.ReadAllText("analysis.json"));
+            }            
+
+            SetMainForm();
+        }
+
+        private void SetMainForm()
+        {
+            textBox1.Text = _state.SelectedFolder;
+            SetListView();
+        }
+
+        private void SetListView()
+        {
+            listView1.Items.Clear();
+            if (_state.FilesDiscovered != null) {
+                listView1.Items.AddRange(_state.FilesDiscovered.Select(f => {
+                    ListViewItem item = new ListViewItem(f.Name);
+                    item.SubItems.Add(FileUtils.SizeSuffix(f.Length));
+                    item.SubItems.Add(f.DirectoryName);
+                    item.SubItems.Add(f.FullPath);
+                    item.SubItems.Add(f.Hash);
+                    return item;
+                }).ToArray());
+            }
+        }
 
         private async void button4_Click(object sender, EventArgs e)
         {
@@ -331,6 +353,8 @@ namespace DiskExplorer
             }).ToArray());
 
             await SetStripStatus(_state.FilesDiscovered.Length, elapsedSeconds, _state.FilesDiscovered.Sum(f => f.Length));
+
+            SaveState();
         }
 
         private async void buttonFindDuplicates_Click(object sender, EventArgs e)
@@ -342,6 +366,16 @@ namespace DiskExplorer
                 .ToDictionary(g => g.Key, g => g.Value);
 
             new Form2(duplicates, _state.SelectedFolder).Show();
+        }
+
+        private void toolStripSplitButtonOld_ButtonClick(object sender, EventArgs e)
+        {
+            Application.VisualStyleState = System.Windows.Forms.VisualStyles.VisualStyleState.NonClientAreaEnabled;
+        }
+
+        private void toolStripSplitButtonNew_ButtonClick(object sender, EventArgs e)
+        {
+            Application.VisualStyleState = System.Windows.Forms.VisualStyles.VisualStyleState.ClientAndNonClientAreasEnabled;
         }
     }
 }

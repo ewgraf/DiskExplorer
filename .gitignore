@@ -50,3 +50,13 @@ Temporary Items
 *.Cache
 *.exe
 *.pdb
+*.exe
+.vs/DiskExplorer/v15/.suo
+*.ide
+*.exe
+*.pdb
+*.cache
+*.cache
+*.Cache
+*.cache
+*.pdb

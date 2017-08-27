@@ -7,8 +7,10 @@ namespace DiskExplorer
 {
 	public class Hash
 	{
-		// https://stackoverflow.com/questions/12416249/hashing-a-string-with-sha256
-		public static string GetSHA256(byte[] bytes)
+        public static long MaxBufLengthPerCore = 134217728;//2147483648 / Environment.ProcessorCount;
+        // 134217728 100 Mb  536870912 512 Mb  1073741824 1 Gb  2147483648 2 Gb - max VirtualMemory at .net 4.7  27.08.2017 18:04 GMT+3
+        // https://stackoverflow.com/questions/12416249/hashing-a-string-with-sha256
+        public static string GetSHA256(byte[] bytes)
 		{
 			SHA256Managed hashstring = new SHA256Managed();
 			byte[] hash = hashstring.ComputeHash(bytes);
@@ -38,11 +40,9 @@ namespace DiskExplorer
             using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
                 ulong result = 0;
                 int bytesRead;
-                var buffer = new byte[134217728]; // 134217728 100 Mb  1073741824 1 Gb
+                var buffer = new byte[MaxBufLengthPerCore];
                 while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0) {
-                    var tmpBuffer = new byte[bytesRead];
-                    Array.Copy(buffer, 0, tmpBuffer, 0, bytesRead);
-                    result += SuperFastHashUnsafe(tmpBuffer);
+                    result += SuperFastHashUnsafe(buffer, bytesRead);
                     // TODO: Process bytesRead number of bytes from the buffer
                     // not the entire buffer as the size of the buffer is 1KB
                     // whereas the actual number of bytes that are read are 
@@ -52,10 +52,9 @@ namespace DiskExplorer
             }
         }
 
-
-        public static unsafe ulong SuperFastHashUnsafe(byte[] dataToHash)
+        // http://landman-code.blogspot.ru/2009/02/c-superfasthash-and-murmurhash2.html
+        public static unsafe ulong SuperFastHashUnsafe(byte[] dataToHash, long dataLength)
         {
-            long dataLength = dataToHash.Length;
             if (dataLength == 0) {
                 return 0;
             }                

@@ -31,10 +31,10 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.listView1 = new System.Windows.Forms.ListView();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripSplitButtonOld = new System.Windows.Forms.ToolStripSplitButton();
+            this.toolStripSplitButtonNew = new System.Windows.Forms.ToolStripSplitButton();
             this.toolStripSplitButtonCancel = new System.Windows.Forms.ToolStripSplitButton();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripStatusLabelDiskUsage = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripProgressBarDiskUsage = new System.Windows.Forms.ToolStripProgressBar();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -65,15 +65,35 @@
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripSplitButtonOld,
+            this.toolStripSplitButtonNew,
             this.toolStripSplitButtonCancel,
-            this.toolStripStatusLabel1,
-            this.toolStripStatusLabelDiskUsage,
-            this.toolStripProgressBarDiskUsage});
+            this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 389);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(884, 22);
             this.statusStrip1.TabIndex = 3;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripSplitButtonOld
+            // 
+            this.toolStripSplitButtonOld.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripSplitButtonOld.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSplitButtonOld.Image")));
+            this.toolStripSplitButtonOld.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripSplitButtonOld.Name = "toolStripSplitButtonOld";
+            this.toolStripSplitButtonOld.Size = new System.Drawing.Size(42, 20);
+            this.toolStripSplitButtonOld.Text = "Old";
+            this.toolStripSplitButtonOld.ButtonClick += new System.EventHandler(this.toolStripSplitButtonOld_ButtonClick);
+            // 
+            // toolStripSplitButtonNew
+            // 
+            this.toolStripSplitButtonNew.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripSplitButtonNew.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSplitButtonNew.Image")));
+            this.toolStripSplitButtonNew.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripSplitButtonNew.Name = "toolStripSplitButtonNew";
+            this.toolStripSplitButtonNew.Size = new System.Drawing.Size(47, 20);
+            this.toolStripSplitButtonNew.Text = "New";
+            this.toolStripSplitButtonNew.ButtonClick += new System.EventHandler(this.toolStripSplitButtonNew_ButtonClick);
             // 
             // toolStripSplitButtonCancel
             // 
@@ -91,17 +111,6 @@
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(39, 17);
             this.toolStripStatusLabel1.Text = "Ready";
-            // 
-            // toolStripStatusLabelDiskUsage
-            // 
-            this.toolStripStatusLabelDiskUsage.Name = "toolStripStatusLabelDiskUsage";
-            this.toolStripStatusLabelDiskUsage.Size = new System.Drawing.Size(63, 17);
-            this.toolStripStatusLabelDiskUsage.Text = "Disk usage";
-            // 
-            // toolStripProgressBarDiskUsage
-            // 
-            this.toolStripProgressBarDiskUsage.Name = "toolStripProgressBarDiskUsage";
-            this.toolStripProgressBarDiskUsage.Size = new System.Drawing.Size(100, 16);
             // 
             // textBox1
             // 
@@ -179,9 +188,9 @@
             // 
             // buttonFindDuplicates
             // 
-            this.buttonFindDuplicates.Location = new System.Drawing.Point(226, 20);
+            this.buttonFindDuplicates.Location = new System.Drawing.Point(226, 19);
             this.buttonFindDuplicates.Name = "buttonFindDuplicates";
-            this.buttonFindDuplicates.Size = new System.Drawing.Size(75, 23);
+            this.buttonFindDuplicates.Size = new System.Drawing.Size(75, 24);
             this.buttonFindDuplicates.TabIndex = 13;
             this.buttonFindDuplicates.Text = "button4";
             this.buttonFindDuplicates.UseVisualStyleBackColor = true;
@@ -257,8 +266,8 @@
 		private System.Windows.Forms.Button buttonLoad;
 		private System.Windows.Forms.Button buttonHash;
         private System.Windows.Forms.Button buttonFindDuplicates;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelDiskUsage;
-        private System.Windows.Forms.ToolStripProgressBar toolStripProgressBarDiskUsage;
+        private System.Windows.Forms.ToolStripSplitButton toolStripSplitButtonOld;
+        private System.Windows.Forms.ToolStripSplitButton toolStripSplitButtonNew;
     }
 }
 

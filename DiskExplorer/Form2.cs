@@ -25,11 +25,12 @@ namespace DiskExplorer
 
             duplicates = d;
             folder = f;
-            ColumnHeader[] columns = new ColumnHeader[4] { 
+            var columns = new ColumnHeader[] { 
                 new ColumnHeader(0){ Text = "Name",      Width = 120  },
-                new ColumnHeader(0){ Text = "Path",     Width = 0   },
+                new ColumnHeader(0){ Text = "Directory", Width = 50  },
                 new ColumnHeader(0){ Text = "Size",   Width = 70  },
-                new ColumnHeader(0){ Text = "Last write time",  Width = 150  }
+                new ColumnHeader(0){ Text = "Last write time",  Width = 150  },
+                new ColumnHeader(0){ Text = "Hash",  Width = 150  }
             };
             listView1.Columns[1].Width = listView1.Width - listView1.Columns[0].Width - listView1.Columns[2].Width - listView1.Columns[3].Width - 21;
             listView1.Columns.Clear();
@@ -51,9 +52,10 @@ namespace DiskExplorer
                     var item = new ListViewItem(
                         new string[] {
                             f.Name,
-                            f.Hash,
+                            f.DirectoryName,
                             f.SizeWithPrefix(),
-                            f.LastWriteTime.ToString()
+                            f.LastWriteTime.ToString(),
+                            f.Hash,
                         });
                         if (coloriseGroup) {
                             item.BackColor = SystemColors.Control;
@@ -71,7 +73,7 @@ namespace DiskExplorer
 
         private void listView1_Resize(object sender, EventArgs e)
         {
-            listView1.Columns[1].Width = listView1.Width - listView1.Columns[0].Width - listView1.Columns[2].Width - listView1.Columns[3].Width - 21;
+            listView1.Columns[1].Width = listView1.Width - listView1.Columns[0].Width - listView1.Columns[2].Width - listView1.Columns[3].Width - listView1.Columns[4].Width - 21;
         }
 
         private void listView1_MouseClick(object sender, MouseEventArgs e)
