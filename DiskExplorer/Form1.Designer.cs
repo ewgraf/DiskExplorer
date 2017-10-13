@@ -33,8 +33,6 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripSplitButtonOld = new System.Windows.Forms.ToolStripSplitButton();
             this.toolStripSplitButtonNew = new System.Windows.Forms.ToolStripSplitButton();
-            this.toolStripSplitButtonCancel = new System.Windows.Forms.ToolStripSplitButton();
-            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -42,9 +40,9 @@
             this.buttonDiscover = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.buttonFindDuplicates = new System.Windows.Forms.Button();
-            this.buttonHash = new System.Windows.Forms.Button();
             this.buttonLoad = new System.Windows.Forms.Button();
             this.buttonSave = new System.Windows.Forms.Button();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -57,7 +55,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listView1.Location = new System.Drawing.Point(6, 49);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(848, 234);
+            this.listView1.Size = new System.Drawing.Size(848, 414);
             this.listView1.TabIndex = 1;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView1_ColumnClick);
@@ -67,9 +65,8 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripSplitButtonOld,
             this.toolStripSplitButtonNew,
-            this.toolStripSplitButtonCancel,
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 389);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 539);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(884, 22);
             this.statusStrip1.TabIndex = 3;
@@ -94,23 +91,6 @@
             this.toolStripSplitButtonNew.Size = new System.Drawing.Size(47, 20);
             this.toolStripSplitButtonNew.Text = "New";
             this.toolStripSplitButtonNew.ButtonClick += new System.EventHandler(this.toolStripSplitButtonNew_ButtonClick);
-            // 
-            // toolStripSplitButtonCancel
-            // 
-            this.toolStripSplitButtonCancel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripSplitButtonCancel.Enabled = false;
-            this.toolStripSplitButtonCancel.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSplitButtonCancel.Image")));
-            this.toolStripSplitButtonCancel.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripSplitButtonCancel.Name = "toolStripSplitButtonCancel";
-            this.toolStripSplitButtonCancel.Size = new System.Drawing.Size(59, 20);
-            this.toolStripSplitButtonCancel.Text = "Cancel";
-            this.toolStripSplitButtonCancel.ButtonClick += new System.EventHandler(this.toolStripSplitButtonCancel_ButtonClick);
-            // 
-            // toolStripStatusLabel1
-            // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(39, 17);
-            this.toolStripStatusLabel1.Text = "Ready";
             // 
             // textBox1
             // 
@@ -174,70 +154,66 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.buttonFindDuplicates);
-            this.groupBox2.Controls.Add(this.buttonHash);
             this.groupBox2.Controls.Add(this.buttonLoad);
             this.groupBox2.Controls.Add(this.buttonSave);
             this.groupBox2.Controls.Add(this.buttonDiscover);
             this.groupBox2.Controls.Add(this.listView1);
             this.groupBox2.Location = new System.Drawing.Point(12, 67);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(860, 319);
+            this.groupBox2.Size = new System.Drawing.Size(860, 469);
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Analyze";
             // 
             // buttonFindDuplicates
             // 
-            this.buttonFindDuplicates.Location = new System.Drawing.Point(226, 19);
+            this.buttonFindDuplicates.Location = new System.Drawing.Point(117, 19);
             this.buttonFindDuplicates.Name = "buttonFindDuplicates";
-            this.buttonFindDuplicates.Size = new System.Drawing.Size(75, 24);
+            this.buttonFindDuplicates.Size = new System.Drawing.Size(109, 24);
             this.buttonFindDuplicates.TabIndex = 13;
-            this.buttonFindDuplicates.Text = "button4";
+            this.buttonFindDuplicates.Text = "Show duplicates";
             this.buttonFindDuplicates.UseVisualStyleBackColor = true;
             this.buttonFindDuplicates.Click += new System.EventHandler(this.buttonFindDuplicates_Click);
             // 
-            // buttonHash
-            // 
-            this.buttonHash.Location = new System.Drawing.Point(117, 19);
-            this.buttonHash.Name = "buttonHash";
-            this.buttonHash.Size = new System.Drawing.Size(103, 24);
-            this.buttonHash.TabIndex = 11;
-            this.buttonHash.Text = "Compute hashes";
-            this.buttonHash.UseVisualStyleBackColor = true;
-            this.buttonHash.Click += new System.EventHandler(this.buttonHash_Click);
-            // 
             // buttonLoad
             // 
-            this.buttonLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonLoad.Location = new System.Drawing.Point(117, 289);
+            this.buttonLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonLoad.Location = new System.Drawing.Point(657, 19);
             this.buttonLoad.Name = "buttonLoad";
-            this.buttonLoad.Size = new System.Drawing.Size(104, 24);
+            this.buttonLoad.Size = new System.Drawing.Size(197, 24);
             this.buttonLoad.TabIndex = 10;
-            this.buttonLoad.Text = "Load analisys";
+            this.buttonLoad.Text = "Load scanned files from .json";
             this.buttonLoad.UseVisualStyleBackColor = true;
             this.buttonLoad.Click += new System.EventHandler(this.buttonLoad_Click);
             // 
             // buttonSave
             // 
-            this.buttonSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonSave.Location = new System.Drawing.Point(6, 289);
+            this.buttonSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonSave.Location = new System.Drawing.Point(431, 19);
             this.buttonSave.Name = "buttonSave";
-            this.buttonSave.Size = new System.Drawing.Size(105, 24);
+            this.buttonSave.Size = new System.Drawing.Size(220, 24);
             this.buttonSave.TabIndex = 9;
-            this.buttonSave.Text = "Save analysis";
+            this.buttonSave.Text = "Save scanned files list to .json";
             this.buttonSave.UseVisualStyleBackColor = true;
             this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(39, 17);
+            this.toolStripStatusLabel1.Text = "Ready";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(884, 411);
+            this.ClientSize = new System.Drawing.Size(884, 561);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.statusStrip1);
             this.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.statusStrip1.ResumeLayout(false);
@@ -254,20 +230,18 @@
 
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
 		private System.Windows.Forms.TextBox textBox1;
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.Button button2;
 		private System.Windows.Forms.Button buttonDiscover;
-		private System.Windows.Forms.ToolStripSplitButton toolStripSplitButtonCancel;
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.Button buttonSave;
 		private System.Windows.Forms.Button buttonLoad;
-		private System.Windows.Forms.Button buttonHash;
         private System.Windows.Forms.Button buttonFindDuplicates;
         private System.Windows.Forms.ToolStripSplitButton toolStripSplitButtonOld;
         private System.Windows.Forms.ToolStripSplitButton toolStripSplitButtonNew;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
     }
 }
 

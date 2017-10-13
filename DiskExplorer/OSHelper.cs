@@ -6,8 +6,7 @@ namespace DiskExplorer
 	{
 		public static string SelectFolder()
 		{
-            using (var ofd = new CommonOpenFileDialog()
-            {
+            using (var ofd = new CommonOpenFileDialog() {
                 Multiselect = false,
                 RestoreDirectory = true,
                 IsFolderPicker = true,

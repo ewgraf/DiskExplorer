@@ -33,7 +33,11 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.WindowsAPICodePack.Core.1.1.0\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
@@ -58,7 +62,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common.cs" />
-    <Compile Include="FileInfoExtended.cs" />
+    <Compile Include="DiscoverForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DiscoverForm.Designer.cs">
+      <DependentUpon>DiscoverForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\FileInfoExtended.cs" />
+    <Compile Include="Entities\PauseToken.cs" />
+    <Compile Include="Entities\State.cs" />
+    <Compile Include="Explorer.cs" />
     <Compile Include="FileUtils.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -74,14 +87,26 @@
     </Compile>
     <Compile Include="Hash.cs" />
     <Compile Include="ListViewColumnSorter.cs" />
+    <Compile Include="LoadStateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoadStateForm.Designer.cs">
+      <DependentUpon>LoadStateForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="OSHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="DiscoverForm.resx">
+      <DependentUpon>DiscoverForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form2.resx">
       <DependentUpon>Form2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoadStateForm.resx">
+      <DependentUpon>LoadStateForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -93,6 +118,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="app.manifest">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -109,6 +137,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

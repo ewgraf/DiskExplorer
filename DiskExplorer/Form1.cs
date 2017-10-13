@@ -5,46 +5,26 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using DiskExplorer.Entities;
 
 namespace DiskExplorer
 {
-	public partial class Form1 : Form
-	{
-		public class State
-		{
-			public string SelectedFolder = @"E:\Unsorted\С торрента";
-			public FileInfoExtended[] FilesDiscovered;
-			[JsonIgnore]
-			public CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
-		}
-
+	public partial class Form1 : Form {
+        private static string[] Columns = new[] { "Directory", "Name", "Length", "Hash" };
+        private ListViewColumnSorter sorter = new ListViewColumnSorter();
 		public static State _state = new State();
         public static object _lock = new object();
-        private ListViewColumnSorter sorter = new ListViewColumnSorter();
 
-        public Form1()
-		{
-			InitializeComponent();
-        }
+        public Form1() => InitializeComponent();
 
-		private void Form1_Load(object sender, EventArgs e)
-		{
+		private void Form1_Load(object sender, EventArgs e) {
 			listView1.GridLines = true;
 			listView1.View = View.Details;
-
-			listView1.Columns.Add("Name").Width = 300;
-			listView1.Columns.Add("Length").Width = 100;
-			listView1.Columns.Add("Directory name").Width = 100;
-			listView1.Columns.Add("Full path").Width = 500;
-			listView1.Columns.Add("Hash").Width = 400;
-
-			listView1.ListViewItemSorter = sorter;
-
-            LoadState();
-            SetMainForm();
+            listView1.Columns.AddRange(Columns.Select(c => new ColumnHeader { Text = c }).ToArray());
+            listView1.ListViewItemSorter = sorter;
+            LoadScan();
         }
 
 		static long GetDirectorySize(string path)
@@ -89,7 +69,7 @@ namespace DiskExplorer
 			}
 		}
 
-		private static IEnumerable<FileInfoExtended> GetFiles(string path, IProgress<(int, long)> progress = null, CancellationTokenSource token = null)
+		private static /*async */IEnumerable<FileInfoExtended> GetFiles(string path, IProgress<(int, long, string)> progress = null, /*PauseToken pauseToken = null, */CancellationTokenSource token = null)
 		{
             int filesDiscovered = 0;
             long filesSizeDiscovered = 0;
@@ -97,19 +77,27 @@ namespace DiskExplorer
             for (int i = 0; i < directories.Count && (!token?.IsCancellationRequested ?? true); i++) {
 				string directory = directories[i];
                 foreach (FileInfoExtended fileInfo in GetFilesOrDefault(directory).Select(f => new FileInfoExtended(f))) {
+                    if (token?.IsCancellationRequested ?? true) {
+                        break;
+                    }
+                    //if(pauseToken?.IsPaused ?? true) {
+                    //    await pauseToken.WaitWhilePausedAsync();
+                    //}
                     if (fileInfo.FullPath.Length > 260) { // MAX_PATH = 260, Windows OS since 2000.XP,2003
                         throw new ArgumentException($"Path '{path}' is too long to be handle by your OS. Consined doing something to reduce length.");
                     }
                     filesDiscovered++;
                     filesSizeDiscovered += fileInfo.Length;
+                    
                     yield return fileInfo;
+                    if(progress != null) {
+                        if (DateTime.UtcNow.Millisecond >= 777) {
+                            progress.Report((filesDiscovered, filesSizeDiscovered, fileInfo.FullPath));
+                        }
+                    }
                 }
 				string[] dirDirectories = GetDirectoriesOrDefault(directory);
 				directories.AddRange(dirDirectories);
-
-                if (filesDiscovered % 1000 == 0) {
-                    progress.Report((filesDiscovered, filesSizeDiscovered));
-                }
             }
 		}
 
@@ -183,189 +171,78 @@ namespace DiskExplorer
 			textBox1.Text = _state.SelectedFolder;
 		}
 
-		private void button2_Click(object sender, EventArgs e)
-		{
-			Process.Start(_state.SelectedFolder);
-		}
+		private void button2_Click(object sender, EventArgs e) => Process.Start(_state.SelectedFolder);
+		private void textBox1_TextChanged(object sender, EventArgs e) => _state.SelectedFolder = textBox1.Text;
+		private void buttonSave_Click(object sender, EventArgs e) => File.WriteAllText("analysis.json", JsonConvert.SerializeObject(_state));
+        private void buttonLoad_Click(object sender, EventArgs e) => LoadScan();
 
-		private Task SetStripStatus(int length, double seconds, long totalSize)
-		{
-			toolStripStatusLabel1.Text = $"{length} files discovered in {seconds:#.###} seconds {FileUtils.SizeSuffix(totalSize)} discovered";
-			return Task.CompletedTask;
-		}
-
-		private void textBox1_TextChanged(object sender, EventArgs e)
-		{
-			_state.SelectedFolder = textBox1.Text;
-		}
-
-		private void toolStripSplitButtonCancel_ButtonClick(object sender, EventArgs e)
-		{
-			_state.CancellationTokenSource.Cancel();
-			toolStripSplitButtonCancel.Enabled = false;
-		}
-
-		private void buttonSave_Click(object sender, EventArgs e)
-		{
-			File.WriteAllText("analysis.json", JsonConvert.SerializeObject(_state));
-		}
-
-		private void buttonLoad_Click(object sender, EventArgs e)
-		{
-			_state = JsonConvert.DeserializeObject<State>(File.ReadAllText("analysis.json"));
-
-            SetMainForm();
+        private void LoadScan() {
+            var loadStateForm = new LoadStateForm();
+            var dialogResult = loadStateForm.ShowDialog();
+            if (dialogResult == DialogResult.OK) {
+                _state = loadStateForm.State;
+                SetMainForm();
+            }
         }
 
-        private async Task<FileInfoExtended[]> ComputeHashes(FileInfoExtended[] files, IProgress<int> progress = null)
-        {
-            int index = 0;
-            return files
-                .AsParallel()
-                .Select(f => {
-                    if (++index % 10 == 0) {
-                        progress.Report(index);
-                    }
-                    return new FileInfoExtended(f, Hash.GetFileHash(f.FullPath));
-                    //return new FileInfoExtended(f, Hash.SuperFastHashUnsafeFile(f.FullPath));
-                })
-                .ToArray();
-        }
+        private void SaveState() => File.WriteAllText("analysis.json", JsonConvert.SerializeObject(_state));
 
-        private async void buttonHash_Click(object sender, EventArgs e)
-		{
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            _state.FilesDiscovered = await Task.Run(() => 
-                ComputeHashes(_state.FilesDiscovered,
-                    new Progress<int>(index => {
-                        toolStripStatusLabel1.Text = $"{index} / {_state.FilesDiscovered.Length} hashes";
-                    })
-                )
-            );
-            stopwatch.Stop();
-
-            toolStripStatusLabel1.Text = $"{_state.FilesDiscovered.Length} files hashed in {stopwatch.Elapsed.TotalSeconds} seconds";
-
-            SetListView();
-            SaveState();
-		}
-
-        private void SaveState()
-        {
-            File.WriteAllText("analysis.json", JsonConvert.SerializeObject(_state));
-        }
-
-        private void LoadState()
-        {
-            if (File.Exists("analysis.json")) {
-                _state = JsonConvert.DeserializeObject<State>(File.ReadAllText("analysis.json"));
-            }            
-
-            SetMainForm();
-        }
-
-        private void SetMainForm()
-        {
+        private void SetMainForm() {
             textBox1.Text = _state.SelectedFolder;
             SetListView();
         }
 
-        private void SetListView()
-        {
+        private void SetListView() {
             listView1.Items.Clear();
-            if (_state.FilesDiscovered != null) {
-                listView1.Items.AddRange(_state.FilesDiscovered.Select(f => {
-                    ListViewItem item = new ListViewItem(f.Name);
+            (listView1.ListViewItemSorter as ListViewColumnSorter).SortColumn = 0;
+            if (_state.Files != null) {
+                listView1.BeginUpdate();
+                listView1.Items.AddRange(_state.Files.Select(f => {
+                    ListViewItem item = new ListViewItem(f.DirectoryName);
+                    item.SubItems.Add(f.Name);                   
                     item.SubItems.Add(FileUtils.SizeSuffix(f.Length));
-                    item.SubItems.Add(f.DirectoryName);
-                    item.SubItems.Add(f.FullPath);
                     item.SubItems.Add(f.Hash);
                     return item;
                 }).ToArray());
+                listView1.EndUpdate();
+                listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             }
         }
 
-        private async void button4_Click(object sender, EventArgs e)
-        {
-            //string scanResultsPath = Path.Combine(Directory.GetParent(_state.SelectedFolder).ToString(), Path.GetFileName(_state.SelectedFolder) + "-duplecates.txt");
-            //// Path.GetFolderName(selectedFolder) on D:\\Новая папка returns D:\\ therefore use Path.GetFileName(selectedFolder)            
-            //using (var file = new StreamWriter(scanResultsPath)) {
-            //    file.WriteLine(_state.SelectedFolder + @"\*");
-            //    foreach (var pair in duplicates) {
-            //        foreach (var path in pair.Value) {
-            //            file.WriteLine(pair.Key + "@" + path);
-            //        }
-            //    }
-            //}
-            //List<string> hashAndPathes = File.ReadAllLines(scanResultsPath).ToList();
-            //string folder = hashAndPathes[0];
-            //hashAndPathes.RemoveAt(0);
-            //Dictionary<string, string> d = new Dictionary<string, string>();
-            //foreach (var line in hashAndPathes) {
-            //    string[] split = line.Split(new char[] { '@' }, 2);
-            //    string hash = split[0];
-            //    string path = split[1];
-            //    d.Add(path, hash);
-            //}
-        }
-
-        private async void buttonDiscover_Click(object sender, EventArgs e)
-        {
-            listView1.Items.Clear();
-            (listView1.ListViewItemSorter as ListViewColumnSorter).SortColumn = 0;
+        private void buttonDiscover_Click(object sender, EventArgs e) {
+            var discoverForm = new DiscoverForm(_state.SelectedFolder);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            double elapsedSeconds = 0;
-            long totalFilesSize = 0;
-            toolStripSplitButtonCancel.Enabled = true;
-            _state.CancellationTokenSource = new CancellationTokenSource();
-
-            _state.FilesDiscovered = await Task.Run(() => GetFiles(_state.SelectedFolder,
-                    new Progress<(int, long)>(value => {
-                        totalFilesSize = value.Item2;
-                        lock (_lock) {
-                            elapsedSeconds = stopwatch.Elapsed.TotalMilliseconds / 1000d;
-                            if (elapsedSeconds == 0) {
-                                elapsedSeconds = 1;
-                            }
-                            double rate = value.Item1 / elapsedSeconds;
-                            toolStripStatusLabel1.Text = $"{_state.SelectedFolder} {value.Item1} files discovered... {rate} files/second {FileUtils.SizeSuffix(totalFilesSize)} discovered so far...";
-                        }
-                    }),
-                    _state.CancellationTokenSource
-                )
-                .ToArray());
-
+            var dialogResult = discoverForm.ShowDialog();
             stopwatch.Stop();
-            elapsedSeconds = stopwatch.Elapsed.TotalMilliseconds / 1000d;
 
-            listView1.Items.AddRange(_state.FilesDiscovered.Select(f => {
-                var item = new ListViewItem(f.Name);
-                item.SubItems.Add(FileUtils.SizeSuffix(f.Length));
-                item.SubItems.Add(f.DirectoryName);
-                item.SubItems.Add(f.FullPath);
-                item.SubItems.Add(f.Hash);
-                return item;
-            }).ToArray());
+            if(dialogResult == DialogResult.OK) {
+                _state.Files = discoverForm.Files;
+                SaveState();
+                SetListView();
+            }
 
-            await SetStripStatus(_state.FilesDiscovered.Length, elapsedSeconds, _state.FilesDiscovered.Sum(f => f.Length));
-
-            SaveState();
+            statusStrip1.Text = $"Scan complete in {stopwatch.Elapsed.TotalSeconds} sec.";
+            //double elapsedSeconds = 0;
+            //long totalFilesSize = 0;
+            //toolStripSplitButtonCancel.Enabled = true;
+            //elapsedSeconds = stopwatch.Elapsed.TotalMilliseconds / 1000d;
+            //await SetStripStatus(_state.FilesDiscovered.Length, elapsedSeconds, _state.FilesDiscovered.Sum(f => f.Length));
         }
 
-        private async void buttonFindDuplicates_Click(object sender, EventArgs e)
+        private void buttonFindDuplicates_Click(object sender, EventArgs e)
         {
-            Dictionary<string, List<FileInfoExtended>> duplicates = _state.FilesDiscovered
+            Dictionary<string, List<FileInfoExtended>> duplicates = _state.Files
                 .GroupBy(g => g.Hash)
                 .ToDictionary(g => g.Key, g => g.ToList())
                 .Where(p => p.Value.Count > 1)
                 .ToDictionary(g => g.Key, g => g.Value);
 
-            new Form2(duplicates, _state.SelectedFolder).Show();
+            var form = new Form2(duplicates, _state.SelectedFolder);
+            form.ShowDialog();
+            var filesRemoved = form.FilesRemoved ?? Array.Empty<string>();
+            _state.Files = _state.Files.Where(f => !filesRemoved.Contains(f.FullPath)).ToArray();
         }
 
         private void toolStripSplitButtonOld_ButtonClick(object sender, EventArgs e)

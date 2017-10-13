@@ -46,3 +46,5 @@ C:\Users\Ewgraf\Documents\GitHub\DiskExplorer\DiskExplorer\obj\Debug\DiskExplore
 C:\Users\Ewgraf\Documents\GitHub\DiskExplorer\DiskExplorer\obj\Debug\DiskExplorer.exe
 C:\Users\Ewgraf\Documents\GitHub\DiskExplorer\DiskExplorer\obj\Debug\DiskExplorer.pdb
 C:\Users\Ewgraf\Documents\GitHub\DiskExplorer\DiskExplorer\obj\Debug\DiskExplorer.Form2.resources
+C:\Users\Ewgraf\Documents\GitHub\DiskExplorer\DiskExplorer\obj\Debug\DiskExplorer.DiscoverForm.resources
+C:\Users\Ewgraf\Documents\GitHub\DiskExplorer\DiskExplorer\obj\Debug\DiskExplorer.LoadStateForm.resources

@@ -5,6 +5,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using Microsoft.VisualBasic.FileIO;
+using DiskExplorer.Entities;
 
 namespace DiskExplorer
 {
@@ -12,12 +14,11 @@ namespace DiskExplorer
     {
         private Dictionary<string, List<FileInfoExtended>> duplicates;
         private string folder;
-
-        // Шрифт
-        private string fontName = string.Empty;
+        private string fontName = string.Empty; // Шрифт
         private float  fontSize = 0f;
-
         private Bitmap preview = null;
+
+        public string[] FilesRemoved { get; private set; }
 
         public Form2(Dictionary<string, List<FileInfoExtended>> d, string f)
         {
@@ -25,12 +26,12 @@ namespace DiskExplorer
 
             duplicates = d;
             folder = f;
-            var columns = new ColumnHeader[] { 
-                new ColumnHeader(0){ Text = "Name",      Width = 120  },
-                new ColumnHeader(0){ Text = "Directory", Width = 50  },
-                new ColumnHeader(0){ Text = "Size",   Width = 70  },
-                new ColumnHeader(0){ Text = "Last write time",  Width = 150  },
-                new ColumnHeader(0){ Text = "Hash",  Width = 150  }
+            var columns = new [] { 
+                new ColumnHeader(0){ Text = "Name",             Width = 120 },
+                new ColumnHeader(0){ Text = "Directory",        Width = 50  },
+                new ColumnHeader(0){ Text = "Size",             Width = 70  },
+                new ColumnHeader(0){ Text = "Last write time",  Width = 150 },
+                new ColumnHeader(0){ Text = "Hash",             Width = 460 }
             };
             listView1.Columns[1].Width = listView1.Width - listView1.Columns[0].Width - listView1.Columns[2].Width - listView1.Columns[3].Width - 21;
             listView1.Columns.Clear();
@@ -68,7 +69,9 @@ namespace DiskExplorer
             }
 
             listView1.Focus();
-            listView1.Items[0].Selected = true;
+            if (listView1.Items.Count != 0) {
+                listView1.Items[0].Selected = true;
+            }            
         }
 
         private void listView1_Resize(object sender, EventArgs e)
@@ -97,42 +100,54 @@ namespace DiskExplorer
 
         private void listView1_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            if(e.Item.Checked)
+            if (e.Item.Checked)
+            {
                 e.Item.Font = new Font(fontName, fontSize, FontStyle.Bold);
-            else
+            } else {
                 e.Item.Font = new Font(fontName, fontSize);
+            }
+                            
         }
 
         private void listView1_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
-            string path = e.Item.SubItems[1].Text;
+            string folder = e.Item.SubItems[1].Text;
+            string filename = e.Item.SubItems[0].Text;
             if (
-                path.EndsWith(".jpg")  ||
-                path.EndsWith(".jpeg") || 
-                path.EndsWith(".png")  || 
-                path.EndsWith(".gif")  || 
-                path.EndsWith(".bmp")  ||
-                path.EndsWith(".gif"))
-                preview = new Bitmap(e.Item.SubItems[1].Text);
-            else
+                filename.EndsWith(".jpg")  ||
+                filename.EndsWith(".jpeg") ||
+                filename.EndsWith(".png")  ||
+                filename.EndsWith(".gif")  ||
+                filename.EndsWith(".bmp")  ||
+                filename.EndsWith(".gif")) {
+                preview = new Bitmap(Path.Combine(folder, filename));
+            } else {
                 preview = null;
+            }                
             pictureBox1.Image = preview;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            List<string> files = new List<string>();
+            var files = new List<string>();
             foreach (ListViewItem item in listView1.Items) {
                 if (item.Checked) {
-                    files.Add(item.SubItems[1].Text);
+                    files.Add(Path.Combine(item.SubItems[1].Text, item.SubItems[0].Text));
                 }                    
             }
-            preview.Dispose();
+            preview?.Dispose();
             pictureBox1.Image = null;
             if (MessageBox.Show(String.Format("Вы хотите удалить {0} файлов?", files.Count), "Подтвержнение", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-                foreach (var item in files) {
-                    File.Delete(item);
-                }
+                files.Where(f => File.Exists(f))
+                    .ToList()
+                    .ForEach(file => {
+                        if ((File.GetAttributes(file) & FileAttributes.Directory) == FileAttributes.Directory) {
+                            throw new Exception("path to remove is folder. it is anacceptable");
+                        }
+                        FileSystem.DeleteFile(file, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                        FilesRemoved = files.ToArray();
+                        this.Close();
+                    });
             }
         }
     }
