@@ -17,8 +17,7 @@ namespace DiskExplorer
             return BytesToHex(hash);
         }
 
-        public static string GetFileHash(string filePath)
-        {
+        public static string GetFileHash(string filePath) {
             using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
                 SHA256Managed hashstring = new SHA256Managed();
                 byte[] hash = hashstring.ComputeHash(fileStream);

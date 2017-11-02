@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -12,7 +13,7 @@ namespace DiskExplorer.Entities
         public string Name { get; set; }
         public long Length { get; set; }
         public string DirectoryName { get; set; }
-        public string FullPath { get; set; }
+        public string FullPath => Path.Combine(DirectoryName, Name);
         public DateTime LastWriteTime { get; set; }
         public string Hash { get; set; }
 
@@ -23,7 +24,6 @@ namespace DiskExplorer.Entities
             Name = _fileInfo.Name;
             Length = _fileInfo.Length;
             DirectoryName = _fileInfo.DirectoryName;
-            FullPath = Path.Combine(DirectoryName, Name);
             LastWriteTime = _fileInfo.LastWriteTime;
         }
 
@@ -31,7 +31,6 @@ namespace DiskExplorer.Entities
             Name = info.Name;
             Length = info.Length;
             DirectoryName = info.DirectoryName;
-            FullPath = Path.Combine(DirectoryName, Name);
             Hash = hash;
         }
 
@@ -39,7 +38,7 @@ namespace DiskExplorer.Entities
     }
 
     public static class FileInfoExtendedExtensions {
-        public static FileInfoExtended[] ComputeHashesParallel(this FileInfoExtended[] files, Func<bool> toUpdate = null, IProgress<(int, long, string)> progress = null, CancellationTokenSource cancellationTokenSource = null) {
+        public static FileInfoExtended[] ComputeHashesParallel(this FileInfoExtended[] files, Func<bool> toUpdate = null, IProgress<(int, long, FileInfoExtended)> progress = null, CancellationTokenSource cancellationTokenSource = null) {
             if(files == null) {
                 throw new ArgumentNullException(nameof(files));
             }
@@ -47,22 +46,34 @@ namespace DiskExplorer.Entities
                 return files;
             }
 
+            var bag = new ConcurrentBag<FileInfoExtended>();
             int filesHashed = 0;
             long filesSizeDiscovered = 0;
-            return files.AsParallel()
-                .Select(f => {
-                    if (cancellationTokenSource?.IsCancellationRequested ?? false) {
-                        throw new OperationCanceledException();
-                    }
-                    filesHashed++;
-                    filesSizeDiscovered += f.Length;
-                    if (progress != null && toUpdate != null && toUpdate()) {
-                        progress.Report((filesHashed, filesSizeDiscovered, f.FullPath));
-                    }
-                    return new FileInfoExtended(f, Hash.GetFileHash(f.FullPath));
-                    //return new FileInfoExtended(f, Hash.SuperFastHashUnsafeFile(f.FullPath));
-                })
-                .ToArray();
+            Parallel.ForEach(files, (f, loopState) => {
+                if (cancellationTokenSource?.IsCancellationRequested ?? false) {
+                    loopState.Break();
+                }
+                filesHashed++;
+                filesSizeDiscovered += f.Length;
+                if (progress != null && toUpdate != null && toUpdate()) {
+                    progress.Report((filesHashed, filesSizeDiscovered, f));
+                }
+                f.Hash = Hash.GetFileHash(f.FullPath);
+                bag.Add(f);
+            });
+            return bag.ToArray();
+            //int filesHashed = 0;
+            //long filesSizeDiscovered = 0;
+            //foreach (FileInfoExtended f in files) {
+            //    token.ThrowIfCancellationRequested();
+            //    filesHashed++;
+            //    filesSizeDiscovered += f.Length;
+            //    if (progress != null && toUpdate != null && toUpdate()) {
+            //        progress.Report((filesHashed, filesSizeDiscovered, f));
+            //    }
+            //    f.Hash = Hash.GetFileHash(f.FullPath);
+            //}
+            //return files;
         }
     }
 }

@@ -5,8 +5,7 @@ using System.Windows.Forms;
 using DiskExplorer.Entities;
 using Newtonsoft.Json;
 
-namespace DiskExplorer
-{
+namespace DiskExplorer {
     public partial class LoadStateForm : Form {
         public State State { get; set; }
         public LoadStateForm() => InitializeComponent();

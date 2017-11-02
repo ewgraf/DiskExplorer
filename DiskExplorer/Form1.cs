@@ -12,7 +12,7 @@ using DiskExplorer.Entities;
 namespace DiskExplorer
 {
 	public partial class Form1 : Form {
-        private static string[] Columns = new[] { "Directory", "Name", "Length", "Hash" };
+        public static string[] Columns = new[] { "Directory", "Name", "Length", "Hash" };
         private ListViewColumnSorter sorter = new ListViewColumnSorter();
 		public static State _state = new State();
         public static object _lock = new object();
@@ -22,13 +22,13 @@ namespace DiskExplorer
 		private void Form1_Load(object sender, EventArgs e) {
 			listView1.GridLines = true;
 			listView1.View = View.Details;
-            listView1.Columns.AddRange(Columns.Select(c => new ColumnHeader { Text = c }).ToArray());
+            listView1.Columns.AddRange(Columns.Select(c => new ColumnHeader { Name = c, Text = c }).ToArray());
+            listView1.Columns["Directory"].Width = 100;
             listView1.ListViewItemSorter = sorter;
             LoadScan();
         }
 
-		static long GetDirectorySize(string path)
-		{
+		static long GetDirectorySize(string path) {
 			// 1.
 			// Get array of all file names.
 			string[] files = Directory.GetFiles(path, "*");
@@ -51,8 +51,7 @@ namespace DiskExplorer
 			return b;
 		}
 
-		public static string[] GetFilesOrDefault(string path, string searchPattern = "*", SearchOption searchOption = SearchOption.TopDirectoryOnly)
-		{
+		public static string[] GetFilesOrDefault(string path, string searchPattern = "*", SearchOption searchOption = SearchOption.TopDirectoryOnly) {
 			try {
 				return Directory.GetFiles(path, searchPattern, searchOption);
 			} catch (UnauthorizedAccessException ex) {
@@ -60,8 +59,7 @@ namespace DiskExplorer
 			}
 		}
 
-		public static string[] GetDirectoriesOrDefault(string path, string searchPattern = "*", SearchOption searchOption = SearchOption.TopDirectoryOnly)
-		{
+		public static string[] GetDirectoriesOrDefault(string path, string searchPattern = "*", SearchOption searchOption = SearchOption.TopDirectoryOnly) {
 			try {
 				return Directory.GetDirectories(path, searchPattern, searchOption);
 			} catch (UnauthorizedAccessException ex) {
@@ -69,8 +67,7 @@ namespace DiskExplorer
 			}
 		}
 
-		private static /*async */IEnumerable<FileInfoExtended> GetFiles(string path, IProgress<(int, long, string)> progress = null, /*PauseToken pauseToken = null, */CancellationTokenSource token = null)
-		{
+		private static /*async */IEnumerable<FileInfoExtended> GetFiles(string path, IProgress<(int, long, string)> progress = null, /*PauseToken pauseToken = null, */CancellationTokenSource token = null) {
             int filesDiscovered = 0;
             long filesSizeDiscovered = 0;
             List<string> directories = new[] { path }.ToList();
@@ -101,8 +98,7 @@ namespace DiskExplorer
             }
 		}
 
-		public static bool TryParseFileSize(string value, out long result)
-		{
+		public static bool TryParseFileSize(string value, out long result) {
 			var values = value.Split(' ');
 			if(values.Length != 2) {
 				result = 0;
@@ -120,8 +116,7 @@ namespace DiskExplorer
 			}
 		}
 
-		private void listView1_ColumnClick(object sender, ColumnClickEventArgs e)
-		{
+		private void listView1_ColumnClick(object sender, ColumnClickEventArgs e) {
 			//if (e.Column != 1)
 			//	return;
 
@@ -165,14 +160,15 @@ namespace DiskExplorer
 			//}
 		}
 
-		private void button1_Click(object sender, EventArgs e)
-		{
-			_state.SelectedFolder = OSHelper.SelectFolder();
-			textBox1.Text = _state.SelectedFolder;
+		private void button1_Click(object sender, EventArgs e) {
+			textBox1.Text = OSHelper.SelectFolder();
 		}
+        
+        private void textBox1_TextChanged(object sender, EventArgs e) {
+            _state.SelectedFolder = textBox1.Text;
+        }
 
 		private void button2_Click(object sender, EventArgs e) => Process.Start(_state.SelectedFolder);
-		private void textBox1_TextChanged(object sender, EventArgs e) => _state.SelectedFolder = textBox1.Text;
 		private void buttonSave_Click(object sender, EventArgs e) => File.WriteAllText("analysis.json", JsonConvert.SerializeObject(_state));
         private void buttonLoad_Click(object sender, EventArgs e) => LoadScan();
 
@@ -189,19 +185,18 @@ namespace DiskExplorer
 
         private void SetMainForm() {
             textBox1.Text = _state.SelectedFolder;
-            SetListView();
-        }
-
-        private void SetListView() {
+            textBoxPattern.Text = _state.Pattern;
             listView1.Items.Clear();
             (listView1.ListViewItemSorter as ListViewColumnSorter).SortColumn = 0;
             if (_state.Files != null) {
                 listView1.BeginUpdate();
                 listView1.Items.AddRange(_state.Files.Select(f => {
-                    ListViewItem item = new ListViewItem(f.DirectoryName);
-                    item.SubItems.Add(f.Name);                   
-                    item.SubItems.Add(FileUtils.SizeSuffix(f.Length));
-                    item.SubItems.Add(f.Hash);
+                    var item = new ListViewItem(new string[] {
+                        f.DirectoryName,
+                        f.Name,
+                        f.SizeWithPrefix(),
+                        f.Hash
+                    });
                     return item;
                 }).ToArray());
                 listView1.EndUpdate();
@@ -210,7 +205,7 @@ namespace DiskExplorer
         }
 
         private void buttonDiscover_Click(object sender, EventArgs e) {
-            var discoverForm = new DiscoverForm(_state.SelectedFolder);
+            var discoverForm = new DiscoverForm(_state.SelectedFolder, _state.Pattern);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -220,7 +215,7 @@ namespace DiskExplorer
             if(dialogResult == DialogResult.OK) {
                 _state.Files = discoverForm.Files;
                 SaveState();
-                SetListView();
+                SetMainForm();
             }
 
             statusStrip1.Text = $"Scan complete in {stopwatch.Elapsed.TotalSeconds} sec.";
@@ -231,28 +226,30 @@ namespace DiskExplorer
             //await SetStripStatus(_state.FilesDiscovered.Length, elapsedSeconds, _state.FilesDiscovered.Sum(f => f.Length));
         }
 
-        private void buttonFindDuplicates_Click(object sender, EventArgs e)
-        {
-            Dictionary<string, List<FileInfoExtended>> duplicates = _state.Files
-                .GroupBy(g => g.Hash)
-                .ToDictionary(g => g.Key, g => g.ToList())
-                .Where(p => p.Value.Count > 1)
-                .ToDictionary(g => g.Key, g => g.Value);
+        private void buttonFindDuplicates_Click(object sender, EventArgs e) {
+            var duplicatesForm = new DuplicatesForm(_state.Files);
+            if (duplicatesForm.ShowDialog() == DialogResult.OK) {
+                _state.Files = _state.Files
+                    .Where(f => !duplicatesForm.FilesDeletedHashes.Contains(f.Hash))
+                    .ToArray();
+                SaveState();
+                SetMainForm();
+            }
 
-            var form = new Form2(duplicates, _state.SelectedFolder);
-            form.ShowDialog();
-            var filesRemoved = form.FilesRemoved ?? Array.Empty<string>();
-            _state.Files = _state.Files.Where(f => !filesRemoved.Contains(f.FullPath)).ToArray();
+            //var filesRemoved = duplicatesForm.FilesDeleted ?? Array.Empty<string>();
+            //_state.Files = _state.Files.Where(f => !filesRemoved.Contains(f.FullPath)).ToArray();
         }
 
-        private void toolStripSplitButtonOld_ButtonClick(object sender, EventArgs e)
-        {
+        private void toolStripSplitButtonOld_ButtonClick(object sender, EventArgs e) {
             Application.VisualStyleState = System.Windows.Forms.VisualStyles.VisualStyleState.NonClientAreaEnabled;
         }
 
-        private void toolStripSplitButtonNew_ButtonClick(object sender, EventArgs e)
-        {
+        private void toolStripSplitButtonNew_ButtonClick(object sender, EventArgs e) {
             Application.VisualStyleState = System.Windows.Forms.VisualStyles.VisualStyleState.ClientAndNonClientAreasEnabled;
+        }
+
+        private void textBoxPattern_TextChanged(object sender, EventArgs e) {
+            _state.Pattern = textBoxPattern.Text;
         }
     }
 }

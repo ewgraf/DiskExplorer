@@ -33,6 +33,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripSplitButtonOld = new System.Windows.Forms.ToolStripSplitButton();
             this.toolStripSplitButtonNew = new System.Windows.Forms.ToolStripSplitButton();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -42,10 +43,12 @@
             this.buttonFindDuplicates = new System.Windows.Forms.Button();
             this.buttonLoad = new System.Windows.Forms.Button();
             this.buttonSave = new System.Windows.Forms.Button();
-            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.textBoxPattern = new System.Windows.Forms.TextBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // listView1
@@ -55,7 +58,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listView1.Location = new System.Drawing.Point(6, 49);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(848, 414);
+            this.listView1.Size = new System.Drawing.Size(848, 365);
             this.listView1.TabIndex = 1;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView1_ColumnClick);
@@ -92,6 +95,13 @@
             this.toolStripSplitButtonNew.Text = "New";
             this.toolStripSplitButtonNew.ButtonClick += new System.EventHandler(this.toolStripSplitButtonNew_ButtonClick);
             // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Enabled = false;
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(39, 17);
+            this.toolStripStatusLabel1.Text = "Ready";
+            // 
             // textBox1
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -100,6 +110,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(651, 20);
             this.textBox1.TabIndex = 4;
+            this.textBox1.Text = "C:\\";
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // button1
@@ -122,7 +133,7 @@
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(860, 49);
+            this.groupBox1.Size = new System.Drawing.Size(860, 44);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Select path";
@@ -158,9 +169,9 @@
             this.groupBox2.Controls.Add(this.buttonSave);
             this.groupBox2.Controls.Add(this.buttonDiscover);
             this.groupBox2.Controls.Add(this.listView1);
-            this.groupBox2.Location = new System.Drawing.Point(12, 67);
+            this.groupBox2.Location = new System.Drawing.Point(12, 116);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(860, 469);
+            this.groupBox2.Size = new System.Drawing.Size(860, 420);
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Analyze";
@@ -197,17 +208,31 @@
             this.buttonSave.UseVisualStyleBackColor = true;
             this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
             // 
-            // toolStripStatusLabel1
+            // textBoxPattern
             // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(39, 17);
-            this.toolStripStatusLabel1.Text = "Ready";
+            this.textBoxPattern.Location = new System.Drawing.Point(6, 19);
+            this.textBoxPattern.Name = "textBoxPattern";
+            this.textBoxPattern.Size = new System.Drawing.Size(848, 20);
+            this.textBoxPattern.TabIndex = 6;
+            this.textBoxPattern.Text = "*";
+            this.textBoxPattern.TextChanged += new System.EventHandler(this.textBoxPattern_TextChanged);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.textBoxPattern);
+            this.groupBox3.Location = new System.Drawing.Point(12, 62);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(860, 48);
+            this.groupBox3.TabIndex = 10;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "With pattern";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 561);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.statusStrip1);
@@ -221,6 +246,8 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -242,6 +269,8 @@
         private System.Windows.Forms.ToolStripSplitButton toolStripSplitButtonOld;
         private System.Windows.Forms.ToolStripSplitButton toolStripSplitButtonNew;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.TextBox textBoxPattern;
+        private System.Windows.Forms.GroupBox groupBox3;
     }
 }
 
