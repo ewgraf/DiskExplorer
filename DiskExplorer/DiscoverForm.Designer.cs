@@ -37,6 +37,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.scanGroupBox = new System.Windows.Forms.GroupBox();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.currentFileSizeLabel = new System.Windows.Forms.Label();
             this.sizeScannedLabel = new System.Windows.Forms.Label();
             this.filesScannedLabel = new System.Windows.Forms.Label();
@@ -53,7 +54,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.discoveringProgressBar.Location = new System.Drawing.Point(9, 19);
             this.discoveringProgressBar.Name = "discoveringProgressBar";
-            this.discoveringProgressBar.Size = new System.Drawing.Size(556, 23);
+            this.discoveringProgressBar.Size = new System.Drawing.Size(590, 23);
             this.discoveringProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.discoveringProgressBar.TabIndex = 0;
             this.discoveringProgressBar.Value = 100;
@@ -62,9 +63,9 @@
             // 
             this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.cancelButton.Location = new System.Drawing.Point(12, 189);
+            this.cancelButton.Location = new System.Drawing.Point(12, 309);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(568, 53);
+            this.cancelButton.Size = new System.Drawing.Size(602, 40);
             this.cancelButton.TabIndex = 1;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
@@ -92,7 +93,7 @@
             // 
             this.sizeDiscoveredLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.sizeDiscoveredLabel.AutoSize = true;
-            this.sizeDiscoveredLabel.Location = new System.Drawing.Point(463, 60);
+            this.sizeDiscoveredLabel.Location = new System.Drawing.Point(497, 60);
             this.sizeDiscoveredLabel.Name = "sizeDiscoveredLabel";
             this.sizeDiscoveredLabel.Size = new System.Drawing.Size(105, 13);
             this.sizeDiscoveredLabel.TabIndex = 4;
@@ -123,15 +124,17 @@
             this.groupBox1.Controls.Add(this.filesDiscoveredLabel);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(568, 85);
+            this.groupBox1.Size = new System.Drawing.Size(602, 85);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Discovery";
             // 
             // scanGroupBox
             // 
-            this.scanGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.scanGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.scanGroupBox.Controls.Add(this.richTextBox1);
             this.scanGroupBox.Controls.Add(this.currentFileSizeLabel);
             this.scanGroupBox.Controls.Add(this.sizeScannedLabel);
             this.scanGroupBox.Controls.Add(this.filesScannedLabel);
@@ -141,59 +144,68 @@
             this.scanGroupBox.Enabled = false;
             this.scanGroupBox.Location = new System.Drawing.Point(12, 103);
             this.scanGroupBox.Name = "scanGroupBox";
-            this.scanGroupBox.Size = new System.Drawing.Size(568, 80);
+            this.scanGroupBox.Size = new System.Drawing.Size(602, 200);
             this.scanGroupBox.TabIndex = 8;
             this.scanGroupBox.TabStop = false;
             this.scanGroupBox.Text = "Scan";
             // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.richTextBox1.Location = new System.Drawing.Point(9, 76);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(587, 118);
+            this.richTextBox1.TabIndex = 9;
+            this.richTextBox1.Text = "";
+            // 
             // currentFileSizeLabel
             // 
             this.currentFileSizeLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.currentFileSizeLabel.AutoSize = true;
-            this.currentFileSizeLabel.Location = new System.Drawing.Point(509, 45);
+            this.currentFileSizeLabel.Location = new System.Drawing.Point(500, 60);
             this.currentFileSizeLabel.Name = "currentFileSizeLabel";
-            this.currentFileSizeLabel.Size = new System.Drawing.Size(13, 13);
+            this.currentFileSizeLabel.Size = new System.Drawing.Size(96, 13);
             this.currentFileSizeLabel.TabIndex = 10;
-            this.currentFileSizeLabel.Text = "--";
-            this.currentFileSizeLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.currentFileSizeLabel.Text = "----------";
+            this.currentFileSizeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // sizeScannedLabel
             // 
             this.sizeScannedLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.sizeScannedLabel.AutoSize = true;
-            this.sizeScannedLabel.Location = new System.Drawing.Point(509, 58);
+            this.sizeScannedLabel.Location = new System.Drawing.Point(500, 45);
             this.sizeScannedLabel.Name = "sizeScannedLabel";
-            this.sizeScannedLabel.Size = new System.Drawing.Size(13, 13);
+            this.sizeScannedLabel.Size = new System.Drawing.Size(96, 15);
             this.sizeScannedLabel.TabIndex = 8;
-            this.sizeScannedLabel.Text = "--";
-            this.sizeScannedLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.sizeScannedLabel.Text = "----------";
+            this.sizeScannedLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // filesScannedLabel
             // 
             this.filesScannedLabel.AutoSize = true;
-            this.filesScannedLabel.Location = new System.Drawing.Point(101, 58);
+            this.filesScannedLabel.Location = new System.Drawing.Point(102, 45);
             this.filesScannedLabel.Name = "filesScannedLabel";
-            this.filesScannedLabel.Size = new System.Drawing.Size(94, 13);
+            this.filesScannedLabel.Size = new System.Drawing.Size(13, 13);
             this.filesScannedLabel.TabIndex = 9;
-            this.filesScannedLabel.Text = "filesScannedLabel";
+            this.filesScannedLabel.Text = "--";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 58);
+            this.label2.Location = new System.Drawing.Point(6, 45);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(75, 13);
+            this.label2.Size = new System.Drawing.Size(98, 13);
             this.label2.TabIndex = 7;
-            this.label2.Text = "Files scanned:";
+            this.label2.Text = "Files scanned total:";
             // 
             // fileScanningLabel
             // 
             this.fileScanningLabel.AutoSize = true;
-            this.fileScanningLabel.Location = new System.Drawing.Point(6, 45);
+            this.fileScanningLabel.Location = new System.Drawing.Point(6, 60);
             this.fileScanningLabel.Name = "fileScanningLabel";
-            this.fileScanningLabel.Size = new System.Drawing.Size(91, 13);
+            this.fileScanningLabel.Size = new System.Drawing.Size(109, 13);
             this.fileScanningLabel.TabIndex = 6;
-            this.fileScanningLabel.Text = "fileScanningLabel";
+            this.fileScanningLabel.Text = "----------------------------------";
             // 
             // scanProgressBar
             // 
@@ -201,14 +213,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.scanProgressBar.Location = new System.Drawing.Point(9, 19);
             this.scanProgressBar.Name = "scanProgressBar";
-            this.scanProgressBar.Size = new System.Drawing.Size(553, 23);
+            this.scanProgressBar.Size = new System.Drawing.Size(587, 23);
             this.scanProgressBar.TabIndex = 0;
             // 
             // DiscoverForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(590, 254);
+            this.ClientSize = new System.Drawing.Size(624, 361);
             this.Controls.Add(this.scanGroupBox);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.cancelButton);
@@ -241,5 +253,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label fileScanningLabel;
         private System.Windows.Forms.Label currentFileSizeLabel;
+        private System.Windows.Forms.RichTextBox richTextBox1;
     }
 }

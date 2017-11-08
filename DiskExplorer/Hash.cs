@@ -10,11 +10,18 @@ namespace DiskExplorer
         public static long MaxBufLengthPerCore = 134217728;//2147483648 / Environment.ProcessorCount;
         // 134217728 100 Mb  536870912 512 Mb  1073741824 1 Gb  2147483648 2 Gb - max VirtualMemory at .net 4.7  27.08.2017 18:04 GMT+3
         // https://stackoverflow.com/questions/12416249/hashing-a-string-with-sha256
-        public static string GetSHA256(byte[] bytes)
-		{
+        public static string GetSHA256(byte[] bytes) {
 			SHA256Managed hashstring = new SHA256Managed();
 			byte[] hash = hashstring.ComputeHash(bytes);
             return BytesToHex(hash);
+        }
+
+        public static string GetSHA1(string filePath) {
+            using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
+                SHA1Managed hashstring = new SHA1Managed();
+                byte[] hash = hashstring.ComputeHash(fileStream);
+                return BytesToHex(hash);
+            }
         }
 
         public static string GetFileHash(string filePath) {
@@ -25,8 +32,7 @@ namespace DiskExplorer
             }
         }
 
-        public static string BytesToHex(byte[] hash)
-        {
+        public static string BytesToHex(byte[] hash) {
             var sb = new StringBuilder();
             foreach (byte x in hash) {
                 sb.AppendFormat("{0:x2}", x);
@@ -34,8 +40,7 @@ namespace DiskExplorer
             return sb.ToString();
         }
 
-        public static string SuperFastHashUnsafeFile(string filePath)
-        {
+        public static string SuperFastHashUnsafeFile(string filePath) {
             using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
                 ulong result = 0;
                 int bytesRead;
@@ -52,8 +57,7 @@ namespace DiskExplorer
         }
 
         // http://landman-code.blogspot.ru/2009/02/c-superfasthash-and-murmurhash2.html
-        public static unsafe ulong SuperFastHashUnsafe(byte[] dataToHash, long dataLength)
-        {
+        public static unsafe ulong SuperFastHashUnsafe(byte[] dataToHash, long dataLength) {
             if (dataLength == 0) {
                 return 0;
             }                

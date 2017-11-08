@@ -7,6 +7,8 @@ using System.Linq;
 using System.Windows.Forms;
 using Microsoft.VisualBasic.FileIO;
 using DiskExplorer.Entities;
+using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace DiskExplorer
 {
@@ -30,27 +32,35 @@ namespace DiskExplorer
                 .ToDictionary(g => g.Key, g => g.ToList())
                 .Where(p => p.Value.Count > 1)
                 .ToDictionary(g => g.Key, g => g.Value);
-            
+
+            UpdateListView(duplicates);            
+        }
+
+        private void UpdateListView(Dictionary<string, List<FileInfoExtended>> duplicates) {
             listView1.BeginUpdate();
+            listView1.Clear();
             listView1.Columns.Clear();
             listView1.Columns.AddRange(Form1.Columns.Select(c => new ColumnHeader { Name = c, Text = c }).ToArray());
             listView1.FullRowSelect = true;
             bool coloriseGroup = true;
             foreach (var duplicate in duplicates) {
                 ListViewItem[] items = duplicate.Value.Select(f => {
-                        var item = new ListViewItem(new string[] {
+                    var item = new ListViewItem(new string[] {
                             f.DirectoryName,
                             f.Name,
                             f.SizeWithPrefix(),
                             f.Hash
                         });
-                        if (coloriseGroup) {
-                            item.BackColor = SystemColors.Control;
-                        }
-                        return item;
-                    })
+                    if (f.Name.EndsWith("asm")) {
+                        ;
+                    }
+                    if (coloriseGroup) {
+                        item.BackColor = SystemColors.Control;
+                    }
+                    return item;
+                })
                     .ToArray();
-                coloriseGroup = !coloriseGroup;                
+                coloriseGroup = !coloriseGroup;
                 listView1.Items.AddRange(items);
             }
             listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
@@ -59,10 +69,10 @@ namespace DiskExplorer
                 listView1.Items[0].Selected = true;
             }
             listView1.EndUpdate();
+            toolStripStatusLabel1.Text = $"{duplicates.Count} groups and {duplicates.Sum(d => d.Value.Count)} files loaded";
         }
 
-        private void listView1_MouseClick(object sender, MouseEventArgs e)
-        {
+        private void listView1_MouseClick(object sender, MouseEventArgs e) {
             if (e.Button == MouseButtons.Right) {
                 if (listView1.FocusedItem.Bounds.Contains(e.Location) == true) {
                     contextMenuStrip1.Show(Cursor.Position);
@@ -71,11 +81,7 @@ namespace DiskExplorer
         }
 
         private void pathToolStripMenuItem_Click(object sender, EventArgs e) {
-            Common.OpenFolder(listView1.SelectedItems[0].SubItems[1].Text);
-        }
-
-        private void открытьToolStripMenuItem_Click(object sender, EventArgs e) {
-            Process.Start(listView1.SelectedItems[0].SubItems[0].Text);
+            
         }
 
         private void listView1_ItemChecked(object sender, ItemCheckedEventArgs e) {
@@ -86,8 +92,7 @@ namespace DiskExplorer
             }                            
         }
 
-        private void listView1_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
-        {
+        private void listView1_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e) {
             string folder = e.Item.SubItems[0].Text;
             string filename = e.Item.SubItems[1].Text;
             if (
@@ -141,6 +146,56 @@ namespace DiskExplorer
                     .ToArray();
                 this.DialogResult = DialogResult.OK;
                 this.Close();
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e) {
+            Regex regex = null;
+            try {
+                regex = new Regex(textBoxFilterRegex.Text);
+            } catch (ArgumentException ex) {
+                MessageBox.Show(ex.ToString(), "Regexp partins error");
+                return;
+            }
+
+            var filtered = _files
+                .Where(f => regex.Match(f.Name).Success)
+                .ToArray();
+
+            Dictionary<string, List<FileInfoExtended>> duplicates = filtered
+                .GroupBy(g => g.Hash)
+                .ToDictionary(g => g.Key, g => g.ToList())
+                .Where(p => p.Value.Count > 1)
+                .ToDictionary(g => g.Key, g => g.Value);
+
+            UpdateListView(duplicates);
+        }
+
+        private void button2_Click(object sender, EventArgs e) {
+            Dictionary<string, List<FileInfoExtended>> duplicates = _files
+                .GroupBy(g => g.Hash)
+                .ToDictionary(g => g.Key, g => g.ToList())
+                .Where(p => p.Value.Count > 1)
+                .ToDictionary(g => g.Key, g => g.Value);
+
+            var q = duplicates.Where(dd => dd.Value.Any(f => f.Name.EndsWith("asm"))).ToArray();
+
+            UpdateListView(duplicates);
+        }
+
+        private void toolStripMenuItemOpen_Click(object s, EventArgs e) {
+            foreach (ListViewItem selectedItem in listView1.SelectedItems) {
+                string directory = selectedItem.SubItems[0].Text;
+                string fileName = selectedItem.SubItems[1].Text;
+                Process.Start(Path.Combine(directory, fileName));
+            }
+        }
+
+        private void toolStripMenuItemShowInFolder_Click(object s, EventArgs e) {
+            foreach (ListViewItem selectedItem in listView1.SelectedItems) {
+                string directory = selectedItem.SubItems[0].Text;
+                string fileName = selectedItem.SubItems[1].Text;
+                Common.OpenFolderAndSelectFile(Path.Combine(directory, fileName));
             }
         }
     }

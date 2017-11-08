@@ -25,6 +25,7 @@ namespace DiskExplorer
             listView1.Columns.AddRange(Columns.Select(c => new ColumnHeader { Name = c, Text = c }).ToArray());
             listView1.Columns["Directory"].Width = 100;
             listView1.ListViewItemSorter = sorter;
+            statusStrip1.ShowItemToolTips = false;
             LoadScan();
         }
 
@@ -168,12 +169,12 @@ namespace DiskExplorer
             _state.SelectedFolder = textBox1.Text;
         }
 
-		private void button2_Click(object sender, EventArgs e) => Process.Start(_state.SelectedFolder);
-		private void buttonSave_Click(object sender, EventArgs e) => File.WriteAllText("analysis.json", JsonConvert.SerializeObject(_state));
-        private void buttonLoad_Click(object sender, EventArgs e) => LoadScan();
+        private void button2_Click(object sender, EventArgs e) {
+            Process.Start(_state.SelectedFolder);
+        }
 
-        private void LoadScan() {
-            var loadStateForm = new LoadStateForm();
+        private void LoadScan(string analisysPath = "analysis.json") {
+            var loadStateForm = new LoadStateForm(analisysPath);
             var dialogResult = loadStateForm.ShowDialog();
             if (dialogResult == DialogResult.OK) {
                 _state = loadStateForm.State;
@@ -181,7 +182,14 @@ namespace DiskExplorer
             }
         }
 
-        private void SaveState() => File.WriteAllText("analysis.json", JsonConvert.SerializeObject(_state));
+        private void SaveState() {
+            File.WriteAllText("analysis.json", JsonConvert.SerializeObject(_state));
+        }
+
+        private void SaveStateAs() {
+            string filepath = OSHelper.SaveFile("analysis.json", "JSON | *.json");
+            File.WriteAllText(filepath, JsonConvert.SerializeObject(_state));
+        }
 
         private void SetMainForm() {
             textBox1.Text = _state.SelectedFolder;
@@ -218,7 +226,7 @@ namespace DiskExplorer
                 SetMainForm();
             }
 
-            statusStrip1.Text = $"Scan complete in {stopwatch.Elapsed.TotalSeconds} sec.";
+            toolStripStatusLabel1.Text = $"Scan of {FileUtils.SizeSuffix(_state.Files.Sum(f => f.Length))} complete in {stopwatch.Elapsed}";
             //double elapsedSeconds = 0;
             //long totalFilesSize = 0;
             //toolStripSplitButtonCancel.Enabled = true;
@@ -240,16 +248,29 @@ namespace DiskExplorer
             //_state.Files = _state.Files.Where(f => !filesRemoved.Contains(f.FullPath)).ToArray();
         }
 
-        private void toolStripSplitButtonOld_ButtonClick(object sender, EventArgs e) {
+        private void textBoxPattern_TextChanged(object sender, EventArgs e) {
+            _state.Pattern = textBoxPattern.Text;
+        }
+
+        private void toolStripDropDownButtonOld_Click(object sender, EventArgs e)
+        {
+
             Application.VisualStyleState = System.Windows.Forms.VisualStyles.VisualStyleState.NonClientAreaEnabled;
         }
 
-        private void toolStripSplitButtonNew_ButtonClick(object sender, EventArgs e) {
+        private void toolStripDropDownButtonNew_Click(object sender, EventArgs e)
+        {
+
             Application.VisualStyleState = System.Windows.Forms.VisualStyles.VisualStyleState.ClientAndNonClientAreasEnabled;
         }
 
-        private void textBoxPattern_TextChanged(object sender, EventArgs e) {
-            _state.Pattern = textBoxPattern.Text;
+        private void toolStripDropDownButtonSaveAnalisysAs_Click(object sender, EventArgs e) {
+            SaveStateAs();
+        }
+
+        private void toolStripDropDownButtonLoadAnalisys_Click(object sender, EventArgs e) {
+            string filepath = OSHelper.OpenFile("analysis.json", "JSON | *.json");
+            LoadScan(filepath);
         }
     }
 }

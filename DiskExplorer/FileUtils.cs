@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Linq;
 
-namespace DiskExplorer
-{
-    public static class FileUtils
-    {
+namespace DiskExplorer {
+    public static class FileUtils {
         public static readonly string[] FileSuffixes = new[] { "kF", "MF", "GF", "TF" };
         public static readonly string[] SizeSuffixes = new[] { "Bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
 
-        public enum PrefixType
-        {
+        public enum PrefixType {
             File,
             Size
         }
@@ -27,8 +24,7 @@ namespace DiskExplorer
             return $"{value:#.#} {(type == PrefixType.File ? FileSuffixes[prefixId] : SizeSuffixes[prefixId])}";
         }
 
-        public static long GetPrefixValue(string value)
-        {
+        public static long GetPrefixValue(string value) {
             if (string.IsNullOrEmpty(value)) {
                 throw new ArgumentException(nameof(string.IsNullOrEmpty), nameof(value));
             }
@@ -43,8 +39,7 @@ namespace DiskExplorer
         }
 
         // https://stackoverflow.com/questions/14488796/does-net-provide-an-easy-way-convert-bytes-to-kb-mb-gb-etc
-        public static string SizeSuffix(long value, int decimalPlaces = 1)
-        {
+        public static string SizeSuffix(long value, int decimalPlaces = 1) {
             if (value < 0) {
                 return "-" + SizeSuffix(-value); }
             if (value == 0) {

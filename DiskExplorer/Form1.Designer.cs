@@ -31,8 +31,12 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.listView1 = new System.Windows.Forms.ListView();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripSplitButtonOld = new System.Windows.Forms.ToolStripSplitButton();
-            this.toolStripSplitButtonNew = new System.Windows.Forms.ToolStripSplitButton();
+            this.toolStripDropDownButtonOld = new System.Windows.Forms.ToolStripDropDownButton();
+            this.toolStripDropDownButtonNew = new System.Windows.Forms.ToolStripDropDownButton();
+            this.toolStripDropDownButtonSeparator1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.toolStripDropDownButtonSaveAnalisysAs = new System.Windows.Forms.ToolStripDropDownButton();
+            this.toolStripDropDownButtonLoadAnalisys = new System.Windows.Forms.ToolStripDropDownButton();
+            this.toolStripDropDownButtonSeparator2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -40,9 +44,8 @@
             this.button2 = new System.Windows.Forms.Button();
             this.buttonDiscover = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.buttonFindDuplicates = new System.Windows.Forms.Button();
-            this.buttonLoad = new System.Windows.Forms.Button();
-            this.buttonSave = new System.Windows.Forms.Button();
             this.textBoxPattern = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.statusStrip1.SuspendLayout();
@@ -66,8 +69,12 @@
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripSplitButtonOld,
-            this.toolStripSplitButtonNew,
+            this.toolStripDropDownButtonOld,
+            this.toolStripDropDownButtonNew,
+            this.toolStripDropDownButtonSeparator1,
+            this.toolStripDropDownButtonSaveAnalisysAs,
+            this.toolStripDropDownButtonLoadAnalisys,
+            this.toolStripDropDownButtonSeparator2,
             this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 539);
             this.statusStrip1.Name = "statusStrip1";
@@ -75,25 +82,76 @@
             this.statusStrip1.TabIndex = 3;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // toolStripSplitButtonOld
+            // toolStripDropDownButtonOld
             // 
-            this.toolStripSplitButtonOld.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripSplitButtonOld.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSplitButtonOld.Image")));
-            this.toolStripSplitButtonOld.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripSplitButtonOld.Name = "toolStripSplitButtonOld";
-            this.toolStripSplitButtonOld.Size = new System.Drawing.Size(42, 20);
-            this.toolStripSplitButtonOld.Text = "Old";
-            this.toolStripSplitButtonOld.ButtonClick += new System.EventHandler(this.toolStripSplitButtonOld_ButtonClick);
+            this.toolStripDropDownButtonOld.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.toolStripDropDownButtonOld.AutoToolTip = false;
+            this.toolStripDropDownButtonOld.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButtonOld.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButtonOld.Image")));
+            this.toolStripDropDownButtonOld.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolStripDropDownButtonOld.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.toolStripDropDownButtonOld.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButtonOld.Name = "toolStripDropDownButtonOld";
+            this.toolStripDropDownButtonOld.Overflow = System.Windows.Forms.ToolStripItemOverflow.Never;
+            this.toolStripDropDownButtonOld.ShowDropDownArrow = false;
+            this.toolStripDropDownButtonOld.Size = new System.Drawing.Size(30, 20);
+            this.toolStripDropDownButtonOld.Text = "Old";
+            this.toolStripDropDownButtonOld.Click += new System.EventHandler(this.toolStripDropDownButtonOld_Click);
             // 
-            // toolStripSplitButtonNew
+            // toolStripDropDownButtonNew
             // 
-            this.toolStripSplitButtonNew.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripSplitButtonNew.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSplitButtonNew.Image")));
-            this.toolStripSplitButtonNew.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripSplitButtonNew.Name = "toolStripSplitButtonNew";
-            this.toolStripSplitButtonNew.Size = new System.Drawing.Size(47, 20);
-            this.toolStripSplitButtonNew.Text = "New";
-            this.toolStripSplitButtonNew.ButtonClick += new System.EventHandler(this.toolStripSplitButtonNew_ButtonClick);
+            this.toolStripDropDownButtonNew.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButtonNew.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButtonNew.Image")));
+            this.toolStripDropDownButtonNew.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButtonNew.Name = "toolStripDropDownButtonNew";
+            this.toolStripDropDownButtonNew.ShowDropDownArrow = false;
+            this.toolStripDropDownButtonNew.Size = new System.Drawing.Size(35, 20);
+            this.toolStripDropDownButtonNew.Text = "New";
+            this.toolStripDropDownButtonNew.Click += new System.EventHandler(this.toolStripDropDownButtonNew_Click);
+            // 
+            // toolStripDropDownButtonSeparator1
+            // 
+            this.toolStripDropDownButtonSeparator1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButtonSeparator1.Enabled = false;
+            this.toolStripDropDownButtonSeparator1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButtonSeparator1.Image")));
+            this.toolStripDropDownButtonSeparator1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButtonSeparator1.Name = "toolStripDropDownButtonSeparator1";
+            this.toolStripDropDownButtonSeparator1.ShowDropDownArrow = false;
+            this.toolStripDropDownButtonSeparator1.Size = new System.Drawing.Size(14, 20);
+            this.toolStripDropDownButtonSeparator1.Text = "|";
+            // 
+            // toolStripDropDownButtonSaveAnalisysAs
+            // 
+            this.toolStripDropDownButtonSaveAnalisysAs.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButtonSaveAnalisysAs.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButtonSaveAnalisysAs.Image")));
+            this.toolStripDropDownButtonSaveAnalisysAs.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButtonSaveAnalisysAs.Name = "toolStripDropDownButtonSaveAnalisysAs";
+            this.toolStripDropDownButtonSaveAnalisysAs.ShowDropDownArrow = false;
+            this.toolStripDropDownButtonSaveAnalisysAs.Size = new System.Drawing.Size(102, 20);
+            this.toolStripDropDownButtonSaveAnalisysAs.Text = "Save analisys as...";
+            this.toolStripDropDownButtonSaveAnalisysAs.Click += new System.EventHandler(this.toolStripDropDownButtonSaveAnalisysAs_Click);
+            // 
+            // toolStripDropDownButtonLoadAnalisys
+            // 
+            this.toolStripDropDownButtonLoadAnalisys.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButtonLoadAnalisys.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButtonLoadAnalisys.Image")));
+            this.toolStripDropDownButtonLoadAnalisys.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButtonLoadAnalisys.Name = "toolStripDropDownButtonLoadAnalisys";
+            this.toolStripDropDownButtonLoadAnalisys.ShowDropDownArrow = false;
+            this.toolStripDropDownButtonLoadAnalisys.Size = new System.Drawing.Size(90, 20);
+            this.toolStripDropDownButtonLoadAnalisys.Text = "Load analysis...";
+            this.toolStripDropDownButtonLoadAnalisys.Click += new System.EventHandler(this.toolStripDropDownButtonLoadAnalisys_Click);
+            // 
+            // toolStripDropDownButtonSeparator2
+            // 
+            this.toolStripDropDownButtonSeparator2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButtonSeparator2.Enabled = false;
+            this.toolStripDropDownButtonSeparator2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButtonSeparator2.Image")));
+            this.toolStripDropDownButtonSeparator2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButtonSeparator2.Name = "toolStripDropDownButtonSeparator2";
+            this.toolStripDropDownButtonSeparator2.ShowDropDownArrow = false;
+            this.toolStripDropDownButtonSeparator2.Size = new System.Drawing.Size(14, 20);
+            this.toolStripDropDownButtonSeparator2.Text = "|";
             // 
             // toolStripStatusLabel1
             // 
@@ -164,9 +222,8 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Controls.Add(this.buttonFindDuplicates);
-            this.groupBox2.Controls.Add(this.buttonLoad);
-            this.groupBox2.Controls.Add(this.buttonSave);
             this.groupBox2.Controls.Add(this.buttonDiscover);
             this.groupBox2.Controls.Add(this.listView1);
             this.groupBox2.Location = new System.Drawing.Point(12, 116);
@@ -176,9 +233,18 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Analyze";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(117, 25);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(13, 13);
+            this.label1.TabIndex = 14;
+            this.label1.Text = "|";
+            // 
             // buttonFindDuplicates
             // 
-            this.buttonFindDuplicates.Location = new System.Drawing.Point(117, 19);
+            this.buttonFindDuplicates.Location = new System.Drawing.Point(136, 19);
             this.buttonFindDuplicates.Name = "buttonFindDuplicates";
             this.buttonFindDuplicates.Size = new System.Drawing.Size(109, 24);
             this.buttonFindDuplicates.TabIndex = 13;
@@ -186,30 +252,10 @@
             this.buttonFindDuplicates.UseVisualStyleBackColor = true;
             this.buttonFindDuplicates.Click += new System.EventHandler(this.buttonFindDuplicates_Click);
             // 
-            // buttonLoad
-            // 
-            this.buttonLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonLoad.Location = new System.Drawing.Point(657, 19);
-            this.buttonLoad.Name = "buttonLoad";
-            this.buttonLoad.Size = new System.Drawing.Size(197, 24);
-            this.buttonLoad.TabIndex = 10;
-            this.buttonLoad.Text = "Load scanned files from .json";
-            this.buttonLoad.UseVisualStyleBackColor = true;
-            this.buttonLoad.Click += new System.EventHandler(this.buttonLoad_Click);
-            // 
-            // buttonSave
-            // 
-            this.buttonSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSave.Location = new System.Drawing.Point(431, 19);
-            this.buttonSave.Name = "buttonSave";
-            this.buttonSave.Size = new System.Drawing.Size(220, 24);
-            this.buttonSave.TabIndex = 9;
-            this.buttonSave.Text = "Save scanned files list to .json";
-            this.buttonSave.UseVisualStyleBackColor = true;
-            this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
-            // 
             // textBoxPattern
             // 
+            this.textBoxPattern.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxPattern.Location = new System.Drawing.Point(6, 19);
             this.textBoxPattern.Name = "textBoxPattern";
             this.textBoxPattern.Size = new System.Drawing.Size(848, 20);
@@ -219,6 +265,8 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox3.Controls.Add(this.textBoxPattern);
             this.groupBox3.Location = new System.Drawing.Point(12, 62);
             this.groupBox3.Name = "groupBox3";
@@ -246,6 +294,7 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
@@ -263,14 +312,17 @@
 		private System.Windows.Forms.Button button2;
 		private System.Windows.Forms.Button buttonDiscover;
 		private System.Windows.Forms.GroupBox groupBox2;
-		private System.Windows.Forms.Button buttonSave;
-		private System.Windows.Forms.Button buttonLoad;
         private System.Windows.Forms.Button buttonFindDuplicates;
-        private System.Windows.Forms.ToolStripSplitButton toolStripSplitButtonOld;
-        private System.Windows.Forms.ToolStripSplitButton toolStripSplitButtonNew;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.TextBox textBoxPattern;
         private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButtonOld;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButtonNew;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButtonSaveAnalisysAs;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButtonLoadAnalisys;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButtonSeparator1;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButtonSeparator2;
     }
 }
 

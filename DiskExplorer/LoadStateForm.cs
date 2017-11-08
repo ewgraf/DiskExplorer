@@ -7,12 +7,17 @@ using Newtonsoft.Json;
 
 namespace DiskExplorer {
     public partial class LoadStateForm : Form {
+        private readonly string _analisysPath;
         public State State { get; set; }
-        public LoadStateForm() => InitializeComponent();
 
-        private async void LoadStateForm_Load(object sender, EventArgs e) {
-            if (File.Exists("analysis.json")) {                
-                State = await Task.Run(() => JsonConvert.DeserializeObject<State>(File.ReadAllText("analysis.json")));
+        public LoadStateForm(string analisysPath) {
+            InitializeComponent();
+            _analisysPath = analisysPath;
+        }
+
+        private async void LoadStateForm_Load(object s, EventArgs e) {
+            if (File.Exists(_analisysPath)) {                
+                State = await Task.Run(() => JsonConvert.DeserializeObject<State>(File.ReadAllText(_analisysPath)));
                 this.DialogResult = DialogResult.OK;
             }
             this.Close();

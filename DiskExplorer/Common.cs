@@ -44,15 +44,13 @@ namespace DiskExplorer
             // 2.
             // Calculate total bytes of all files in a loop.
             long b = 0;
-            foreach (string name in a)
-            {
+            foreach (string name in a) {
                 // 3.
                 // Use FileInfo to get length of each file.
                 FileInfo info = new FileInfo(name);
                 b += info.Length;
             }
-            foreach (string dir in d)
-            {
+            foreach (string dir in d) {
                 b += GetDirectorySize(dir);
             }
             // 4.
@@ -99,12 +97,9 @@ namespace DiskExplorer
             return dictionary;
         }
 
-
-        public static void OpenFolder(string filePath)
-        {
+        public static void OpenFolderAndSelectFile(string filePath) {
             var arguments = string.Format("/select,\"{0}\"", filePath);
             Process.Start("explorer.exe", arguments);
         }
-
     }
 }
