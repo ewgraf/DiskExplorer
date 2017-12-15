@@ -8,31 +8,38 @@ using System.Windows.Forms;
 using Microsoft.VisualBasic.FileIO;
 using DiskExplorer.Entities;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace DiskExplorer
 {
     public partial class DuplicatesForm : Form {
-        private string _folder;
+        private string _folderName;
         private string _fontName = "Consolas";
         private float  _fontSize = 9.5f;
         private Bitmap preview = null;
-        private FileInfoExtended[] _files;
+        private Folder _folder;
 
         public string[] FilesDeletedHashes { get; private set; }
 
-        public DuplicatesForm(FileInfoExtended[] files) {
+        private Dictionary<string, List<FileInfoExtended>> GroupDuplicates(Folder folder, Func<FileInfoExtended, bool> predicate = null) {
+            var result = folder.GetAllFiles();
+            if (predicate != null) {
+                result = result.Where(predicate).ToArray();
+            }
+            return result.GroupBy(g => g.Hash)
+               .ToDictionary(g => g.Key, g => g.OrderByDescending(i => i.FullPath.Length).ToList())
+               .Where(p => p.Value.Count > 1)
+               .OrderByDescending(g => g.Value.First().Length)
+               .ToDictionary(g => g.Key, g => g.Value);
+        }
+
+        public DuplicatesForm(Folder folder) {
             InitializeComponent();
 
-            _files = files;
+            _folder = folder;
         }
 
         private void Form2_Load(object sender, EventArgs e) {
-            Dictionary<string, List<FileInfoExtended>> duplicates = _files.GroupBy(g => g.Hash)
-                .ToDictionary(g => g.Key, g => g.ToList())
-                .Where(p => p.Value.Count > 1)
-                .ToDictionary(g => g.Key, g => g.Value);
-
+            Dictionary<string, List<FileInfoExtended>> duplicates = GroupDuplicates(_folder);
             UpdateListView(duplicates);            
         }
 
@@ -44,21 +51,24 @@ namespace DiskExplorer
             listView1.FullRowSelect = true;
             bool coloriseGroup = true;
             foreach (var duplicate in duplicates) {
-                ListViewItem[] items = duplicate.Value.Select(f => {
-                    var item = new ListViewItem(new string[] {
-                            f.DirectoryName,
-                            f.Name,
-                            f.SizeWithPrefix(),
-                            f.Hash
-                        });
-                    if (f.Name.EndsWith("asm")) {
-                        ;
-                    }
-                    if (coloriseGroup) {
-                        item.BackColor = SystemColors.Control;
-                    }
-                    return item;
-                })
+                ListViewItem[] items = duplicate.Value
+                    .Select(f => {
+                        var item = new ListViewItem(new string[] {
+                                f.DirectoryName,
+                                f.Name,
+                                f.CreationTime.ToShortDateString(),
+                                f.LastWriteTime.ToShortDateString(),
+                                f.SizeWithPrefix(),
+                                f.Hash
+                            });
+                        if (f.Name.EndsWith("asm")) {
+                            ;
+                        }
+                        if (coloriseGroup) {
+                            item.BackColor = SystemColors.Control;
+                        }
+                        return item;
+                    })
                     .ToArray();
                 coloriseGroup = !coloriseGroup;
                 listView1.Items.AddRange(items);
@@ -80,10 +90,6 @@ namespace DiskExplorer
             }
         }
 
-        private void pathToolStripMenuItem_Click(object sender, EventArgs e) {
-            
-        }
-
         private void listView1_ItemChecked(object sender, ItemCheckedEventArgs e) {
             if (e.Item.Checked) {
                 e.Item.Font = new Font(_fontName, _fontSize, FontStyle.Bold);
@@ -94,7 +100,7 @@ namespace DiskExplorer
 
         private void listView1_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e) {
             string folder = e.Item.SubItems[0].Text;
-            string filename = e.Item.SubItems[1].Text;
+            string filename = e.Item.SubItems[1].Text.ToLower();
             if (
                 filename.EndsWith(".jpg")  ||
                 filename.EndsWith(".jpeg") ||
@@ -126,7 +132,7 @@ namespace DiskExplorer
                 .Select(i => new FileInfoExtended {
                     DirectoryName = i.SubItems[0].Text,
                     Name = i.SubItems[1].Text,
-                    Hash = i.SubItems[3].Text
+                    Hash = i.SubItems[5].Text
                 })
                 .ToArray();
             preview?.Dispose();
@@ -158,21 +164,13 @@ namespace DiskExplorer
                 return;
             }
 
-            var filtered = _files
-                .Where(f => regex.Match(f.Name).Success)
-                .ToArray();
-
-            Dictionary<string, List<FileInfoExtended>> duplicates = filtered
-                .GroupBy(g => g.Hash)
-                .ToDictionary(g => g.Key, g => g.ToList())
-                .Where(p => p.Value.Count > 1)
-                .ToDictionary(g => g.Key, g => g.Value);
+            Dictionary<string, List<FileInfoExtended>> duplicates = GroupDuplicates(_folder, f => regex.Match(f.FullPath).Success);
 
             UpdateListView(duplicates);
         }
 
         private void button2_Click(object sender, EventArgs e) {
-            Dictionary<string, List<FileInfoExtended>> duplicates = _files
+            Dictionary<string, List<FileInfoExtended>> duplicates = _folder.GetAllFiles()
                 .GroupBy(g => g.Hash)
                 .ToDictionary(g => g.Key, g => g.ToList())
                 .Where(p => p.Value.Count > 1)

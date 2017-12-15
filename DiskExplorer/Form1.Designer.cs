@@ -28,8 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.listView1 = new System.Windows.Forms.ListView();
+            this.listView1 = new DiskExplorer.ListView2();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripDropDownButtonOld = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolStripDropDownButtonNew = new System.Windows.Forms.ToolStripDropDownButton();
@@ -44,14 +45,25 @@
             this.button2 = new System.Windows.Forms.Button();
             this.buttonDiscover = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPageExplorer = new System.Windows.Forms.TabPage();
+            this.listViewExplorer = new System.Windows.Forms.ListView();
+            this.tabPageAllFiles = new System.Windows.Forms.TabPage();
             this.label1 = new System.Windows.Forms.Label();
             this.buttonFindDuplicates = new System.Windows.Forms.Button();
             this.textBoxPattern = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItemOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItemShowInFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPageExplorer.SuspendLayout();
+            this.tabPageAllFiles.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // listView1
@@ -59,12 +71,15 @@
             this.listView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.listView1.Location = new System.Drawing.Point(6, 49);
+            this.listView1.FullRowSelect = true;
+            this.listView1.GridLines = true;
+            this.listView1.Location = new System.Drawing.Point(0, 2);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(848, 365);
+            this.listView1.Size = new System.Drawing.Size(838, 336);
             this.listView1.TabIndex = 1;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView1_ColumnClick);
+            this.listView1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseClick);
             // 
             // statusStrip1
             // 
@@ -222,16 +237,63 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.tabControl1);
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Controls.Add(this.buttonFindDuplicates);
             this.groupBox2.Controls.Add(this.buttonDiscover);
-            this.groupBox2.Controls.Add(this.listView1);
             this.groupBox2.Location = new System.Drawing.Point(12, 116);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(860, 420);
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Analyze";
+            // 
+            // tabControl1
+            // 
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl1.Controls.Add(this.tabPageExplorer);
+            this.tabControl1.Controls.Add(this.tabPageAllFiles);
+            this.tabControl1.Location = new System.Drawing.Point(6, 49);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(848, 365);
+            this.tabControl1.TabIndex = 15;
+            // 
+            // tabPageExplorer
+            // 
+            this.tabPageExplorer.Controls.Add(this.listViewExplorer);
+            this.tabPageExplorer.Location = new System.Drawing.Point(4, 22);
+            this.tabPageExplorer.Name = "tabPageExplorer";
+            this.tabPageExplorer.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageExplorer.Size = new System.Drawing.Size(840, 339);
+            this.tabPageExplorer.TabIndex = 0;
+            this.tabPageExplorer.Text = "Explorer";
+            this.tabPageExplorer.UseVisualStyleBackColor = true;
+            // 
+            // listViewExplorer
+            // 
+            this.listViewExplorer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listViewExplorer.Location = new System.Drawing.Point(0, 2);
+            this.listViewExplorer.Name = "listViewExplorer";
+            this.listViewExplorer.Size = new System.Drawing.Size(838, 336);
+            this.listViewExplorer.TabIndex = 0;
+            this.listViewExplorer.UseCompatibleStateImageBehavior = false;
+            this.listViewExplorer.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listViewExplorer_MouseDoubleClick);
+            // 
+            // tabPageAllFiles
+            // 
+            this.tabPageAllFiles.Controls.Add(this.listView1);
+            this.tabPageAllFiles.Location = new System.Drawing.Point(4, 22);
+            this.tabPageAllFiles.Name = "tabPageAllFiles";
+            this.tabPageAllFiles.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageAllFiles.Size = new System.Drawing.Size(840, 339);
+            this.tabPageAllFiles.TabIndex = 1;
+            this.tabPageAllFiles.Text = "All files";
+            this.tabPageAllFiles.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -275,6 +337,28 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "With pattern";
             // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemOpen,
+            this.toolStripMenuItemShowInFolder});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(178, 48);
+            // 
+            // toolStripMenuItemOpen
+            // 
+            this.toolStripMenuItemOpen.Name = "toolStripMenuItemOpen";
+            this.toolStripMenuItemOpen.Size = new System.Drawing.Size(177, 22);
+            this.toolStripMenuItemOpen.Text = "Открыть";
+            this.toolStripMenuItemOpen.Click += new System.EventHandler(this.toolStripMenuItemOpen_Click);
+            // 
+            // toolStripMenuItemShowInFolder
+            // 
+            this.toolStripMenuItemShowInFolder.Name = "toolStripMenuItemShowInFolder";
+            this.toolStripMenuItemShowInFolder.Size = new System.Drawing.Size(177, 22);
+            this.toolStripMenuItemShowInFolder.Text = "Показать в папке...";
+            this.toolStripMenuItemShowInFolder.Click += new System.EventHandler(this.toolStripMenuItemShowInFolder_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -295,8 +379,12 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPageExplorer.ResumeLayout(false);
+            this.tabPageAllFiles.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -304,7 +392,7 @@
 
         #endregion
 
-        private System.Windows.Forms.ListView listView1;
+        private ListView2 listView1;
         private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.TextBox textBox1;
 		private System.Windows.Forms.Button button1;
@@ -323,6 +411,13 @@
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButtonLoadAnalisys;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButtonSeparator1;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButtonSeparator2;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemOpen;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemShowInFolder;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPageExplorer;
+        private System.Windows.Forms.TabPage tabPageAllFiles;
+        private System.Windows.Forms.ListView listViewExplorer;
     }
 }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace DiskExplorer.Entities {
         public long Length { get; set; }
         public string DirectoryName { get; set; }
         public string FullPath => Path.Combine(DirectoryName, Name);
+        public DateTime CreationTime { get; set; }
         public DateTime LastWriteTime { get; set; }
         public string Hash { get; set; }
 
@@ -23,6 +25,7 @@ namespace DiskExplorer.Entities {
             Name = _fileInfo.Name;
             Length = _fileInfo.Length;
             DirectoryName = _fileInfo.DirectoryName;
+            CreationTime = _fileInfo.CreationTime;
             LastWriteTime = _fileInfo.LastWriteTime;
         }
 
@@ -37,7 +40,7 @@ namespace DiskExplorer.Entities {
     }
 
     public static class FileInfoExtendedExtensions {
-        public static FileInfoExtended[] ComputeHashesParallel(this FileInfoExtended[] files, Func<bool> toUpdate = null, IProgress<(int, long, FileInfoExtended, TimeSpan, long, string)> progress = null, CancellationTokenSource cancellationTokenSource = null) {
+        public static FileInfoExtended[] ComputeHashesParallel(this FileInfoExtended[] files, Func<bool> toUpdate = null, IProgress<(FileInfoExtended, TimeSpan, long, string)> progress = null, CancellationTokenSource cancellationTokenSource = null) {
             if(files == null) {
                 throw new ArgumentNullException(nameof(files));
             }
@@ -47,28 +50,48 @@ namespace DiskExplorer.Entities {
 
             var orderedFiles = files.OrderByDescending(f => f.Length);
             var bag = new ConcurrentBag<FileInfoExtended>();
-            int filesHashed = 0;
-            long filesSizeDiscovered = 0;
+            bool firstIteration = true;
             Parallel.ForEach(orderedFiles, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (f, loopState, i) => {
                 if (cancellationTokenSource?.IsCancellationRequested ?? false) {
                     loopState.Break();
                 }
-                if (filesHashed == 0) {
-                    progress.Report((0, 0, null, TimeSpan.Zero, 0, $"Started hashing size: {f.SizeWithPrefix()} name: {f.Name}"));
+                if (firstIteration) {
+                    progress.Report((null, TimeSpan.Zero, 0, $"Started hashing size: {f.SizeWithPrefix()} name: {f.Name}"));
+                    firstIteration = false;
                 }
 
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                f.Hash = Hash.GetSHA1(f.FullPath);
+                if (!FileUtils.IsFileLocked(f.FullPath)) {
+                    //f.Hash = Hash.GetSHA1(f.FullPath);
+                    try {
+                        f.Hash = Hash.GetMD5(f.FullPath);
+                    } catch (Exception ex) {
+                        f.Hash = ex.Message;
+                    }                    
+                }
                 sw.Stop();
-
-                filesHashed++;
-                filesSizeDiscovered += f.Length;
-                progress.Report((filesHashed, filesSizeDiscovered, f, sw.Elapsed, i, null));
+                
+                if (progress != null && toUpdate != null && toUpdate()) {
+                    progress.Report((f, sw.Elapsed, i, null));
+                }                
                 bag.Add(f);
             });
-            progress.Report((0, 0, null, TimeSpan.Zero, 0, "Done"));
-            return bag.ToArray();
+            progress?.Report((null, TimeSpan.Zero, 0, "Done"));
+            return bag.Where(i => i.Hash != null && i.Hash != string.Empty).ToArray();
+        }
+
+        public static Folder ComputeHashesParallel(this Folder root, Func<bool> toUpdate = null, IProgress<(FileInfoExtended, TimeSpan, long, string)> progress = null, CancellationTokenSource cancellationTokenSource = null) {
+            if (root == null) {
+                throw new ArgumentNullException(nameof(root));
+            }
+
+            List<Folder> folders = new[] { root }.ToList();
+            for (int i = 0; i < folders.Count; i++) {
+                folders[i].Files = ComputeHashesParallel(folders[i].Files, toUpdate, progress, cancellationTokenSource);
+                folders.AddRange(folders[i].Subfolders);
+            }
+            return folders[0];
         }
     }
 }

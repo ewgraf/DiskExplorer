@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 
 namespace DiskExplorer {
@@ -61,6 +62,22 @@ namespace DiskExplorer {
             }
 
             return string.Format("{0:n" + decimalPlaces + "} {1}", adjustedSize, SizeSuffixes[mag]);
+        }
+
+        public static bool IsFileLocked(string filePath) {
+            FileStream stream = null;
+            Exception ex = null;
+            try {
+                stream = File.Open(filePath, FileMode.Open, FileAccess.Read);
+            } catch (IOException) {
+                return true;
+            } catch {
+                return true;
+            } finally {
+                stream?.Close();
+                stream?.Dispose();
+            }
+            return false;
         }
     }
 }

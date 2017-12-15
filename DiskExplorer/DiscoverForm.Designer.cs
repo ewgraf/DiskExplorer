@@ -92,13 +92,12 @@
             // sizeDiscoveredLabel
             // 
             this.sizeDiscoveredLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.sizeDiscoveredLabel.AutoSize = true;
-            this.sizeDiscoveredLabel.Location = new System.Drawing.Point(497, 60);
+            this.sizeDiscoveredLabel.Location = new System.Drawing.Point(506, 60);
             this.sizeDiscoveredLabel.Name = "sizeDiscoveredLabel";
-            this.sizeDiscoveredLabel.Size = new System.Drawing.Size(105, 13);
+            this.sizeDiscoveredLabel.Size = new System.Drawing.Size(90, 13);
             this.sizeDiscoveredLabel.TabIndex = 4;
-            this.sizeDiscoveredLabel.Text = "sizeDiscoveredLabel";
-            this.sizeDiscoveredLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.sizeDiscoveredLabel.Text = "----------";
+            this.sizeDiscoveredLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // progressTimer
             // 
@@ -163,9 +162,9 @@
             // currentFileSizeLabel
             // 
             this.currentFileSizeLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.currentFileSizeLabel.Location = new System.Drawing.Point(500, 60);
+            this.currentFileSizeLabel.Location = new System.Drawing.Point(506, 60);
             this.currentFileSizeLabel.Name = "currentFileSizeLabel";
-            this.currentFileSizeLabel.Size = new System.Drawing.Size(96, 13);
+            this.currentFileSizeLabel.Size = new System.Drawing.Size(90, 13);
             this.currentFileSizeLabel.TabIndex = 10;
             this.currentFileSizeLabel.Text = "----------";
             this.currentFileSizeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -173,9 +172,9 @@
             // sizeScannedLabel
             // 
             this.sizeScannedLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.sizeScannedLabel.Location = new System.Drawing.Point(500, 45);
+            this.sizeScannedLabel.Location = new System.Drawing.Point(506, 45);
             this.sizeScannedLabel.Name = "sizeScannedLabel";
-            this.sizeScannedLabel.Size = new System.Drawing.Size(96, 15);
+            this.sizeScannedLabel.Size = new System.Drawing.Size(90, 15);
             this.sizeScannedLabel.TabIndex = 8;
             this.sizeScannedLabel.Text = "----------";
             this.sizeScannedLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -183,7 +182,7 @@
             // filesScannedLabel
             // 
             this.filesScannedLabel.AutoSize = true;
-            this.filesScannedLabel.Location = new System.Drawing.Point(102, 45);
+            this.filesScannedLabel.Location = new System.Drawing.Point(85, 45);
             this.filesScannedLabel.Name = "filesScannedLabel";
             this.filesScannedLabel.Size = new System.Drawing.Size(13, 13);
             this.filesScannedLabel.TabIndex = 9;
@@ -194,9 +193,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(6, 45);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(98, 13);
+            this.label2.Size = new System.Drawing.Size(75, 13);
             this.label2.TabIndex = 7;
-            this.label2.Text = "Files scanned total:";
+            this.label2.Text = "Files scanned:";
             // 
             // fileScanningLabel
             // 

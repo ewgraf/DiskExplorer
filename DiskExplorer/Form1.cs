@@ -12,9 +12,10 @@ using DiskExplorer.Entities;
 namespace DiskExplorer
 {
 	public partial class Form1 : Form {
-        public static string[] Columns = new[] { "Directory", "Name", "Length", "Hash" };
+        public static string[] Columns = new[] { "Directory", "Name", "Date creation", "Date changed", "Size", "Hash" };
         private ListViewColumnSorter sorter = new ListViewColumnSorter();
-		public static State _state = new State();
+        private ListViewColumnSorter explorerSorter = new ListViewColumnSorter();
+        public static State _state = new State();
         public static object _lock = new object();
 
         public Form1() => InitializeComponent();
@@ -25,6 +26,12 @@ namespace DiskExplorer
             listView1.Columns.AddRange(Columns.Select(c => new ColumnHeader { Name = c, Text = c }).ToArray());
             listView1.Columns["Directory"].Width = 100;
             listView1.ListViewItemSorter = sorter;
+            listView1.FullRowSelect = true;
+            listViewExplorer.GridLines = true;
+            listViewExplorer.View = View.Details;
+            listViewExplorer.Columns.AddRange(new[] { "Name", "Size" }.Select(c => new ColumnHeader { Name = c, Text = c }).ToArray());
+            //listViewExplorer.ListViewItemSorter = explorerSorter;
+            listViewExplorer.FullRowSelect = true;
             statusStrip1.ShowItemToolTips = false;
             LoadScan();
         }
@@ -178,6 +185,7 @@ namespace DiskExplorer
             var dialogResult = loadStateForm.ShowDialog();
             if (dialogResult == DialogResult.OK) {
                 _state = loadStateForm.State;
+                
                 SetMainForm();
             }
         }
@@ -194,22 +202,53 @@ namespace DiskExplorer
         private void SetMainForm() {
             textBox1.Text = _state.SelectedFolder;
             textBoxPattern.Text = _state.Pattern;
+
+            listView1.BeginUpdate();
             listView1.Items.Clear();
-            (listView1.ListViewItemSorter as ListViewColumnSorter).SortColumn = 0;
-            if (_state.Files != null) {
-                listView1.BeginUpdate();
-                listView1.Items.AddRange(_state.Files.Select(f => {
-                    var item = new ListViewItem(new string[] {
-                        f.DirectoryName,
-                        f.Name,
-                        f.SizeWithPrefix(),
-                        f.Hash
-                    });
-                    return item;
-                }).ToArray());
-                listView1.EndUpdate();
+            if (_state.Folder != null) {
+                var items = _state.Folder
+                    .GetAllFiles()
+                    .Select(f => {
+                        var item = new ListViewItem(new string[] {
+                                f.DirectoryName,
+                                f.Name,
+                                f.CreationTime.ToShortDateString(),
+                                f.LastWriteTime.ToShortDateString(),
+                                f.SizeWithPrefix(),
+                                f.Hash
+                        });
+                        return item;
+                    }).ToArray();
+                listView1.Items.AddRange(items);
+                (listView1.ListViewItemSorter as ListViewColumnSorter).SortColumn = 2; // "Size" column
+                listView1.Sort();
                 listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             }
+            listView1.EndUpdate();
+
+            SetExplorerTab();
+        }
+
+        private void SetExplorerTab() {
+            listViewExplorer.BeginUpdate();
+            listViewExplorer.Items.Clear();
+            if (_state.Folder != null) {
+                var folderItems = _state.CurrentlyExploringFolder.Subfolders
+                    .OrderByDescending(f => f.Size)
+                    .Select(f => new ListViewItem(new string[] { $"[{f.Path}]", FileUtils.SizeSuffix(f.Size) }))
+                    .ToArray();
+                var fileItems = _state.CurrentlyExploringFolder.Files
+                    .OrderByDescending(f => f.Length)
+                    .Select(f => new ListViewItem(new string[] { $" {f.FullPath}", f.SizeWithPrefix() }))
+                    .ToArray();
+                listViewExplorer.Items.Add(new ListViewItem(new[] { "[..]", string.Empty }));
+                listViewExplorer.Items.AddRange(folderItems);
+                listViewExplorer.Items.AddRange(fileItems);
+                //(listViewExplorer.ListViewItemSorter as ListViewColumnSorter).SortColumn = 1; // "Size" column
+                //listViewExplorer.Sort();
+                listViewExplorer.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            }
+            listViewExplorer.EndUpdate();
         }
 
         private void buttonDiscover_Click(object sender, EventArgs e) {
@@ -221,31 +260,26 @@ namespace DiskExplorer
             stopwatch.Stop();
 
             if(dialogResult == DialogResult.OK) {
-                _state.Files = discoverForm.Files;
+                _state.Folder = discoverForm.Root;
+                _state.CurrentlyExploringFolder = _state.Folder;
                 SaveState();
                 SetMainForm();
             }
 
-            toolStripStatusLabel1.Text = $"Scan of {FileUtils.SizeSuffix(_state.Files.Sum(f => f.Length))} complete in {stopwatch.Elapsed}";
-            //double elapsedSeconds = 0;
-            //long totalFilesSize = 0;
-            //toolStripSplitButtonCancel.Enabled = true;
-            //elapsedSeconds = stopwatch.Elapsed.TotalMilliseconds / 1000d;
-            //await SetStripStatus(_state.FilesDiscovered.Length, elapsedSeconds, _state.FilesDiscovered.Sum(f => f.Length));
+            toolStripStatusLabel1.Text = $"Scan of {FileUtils.SizeSuffix(_state.Folder.FilesTotal)} complete in {stopwatch.Elapsed}";
         }
 
         private void buttonFindDuplicates_Click(object sender, EventArgs e) {
-            var duplicatesForm = new DuplicatesForm(_state.Files);
-            if (duplicatesForm.ShowDialog() == DialogResult.OK) {
-                _state.Files = _state.Files
-                    .Where(f => !duplicatesForm.FilesDeletedHashes.Contains(f.Hash))
-                    .ToArray();
+            var duplicatesForm = new DuplicatesForm(_state.Folder);
+            if (duplicatesForm.ShowDialog() == DialogResult.OK && duplicatesForm.FilesDeletedHashes.Any()) {
+                List<Folder> folders = new[] { _state.Folder }.ToList();
+                for (int i = 0; i < folders.Count; i++) {
+                    folders[i].Files = folders[i].Files.Where(f => !duplicatesForm.FilesDeletedHashes.Contains(f.Hash)).ToArray();
+                    folders.AddRange(folders[i].Subfolders);
+                }
                 SaveState();
                 SetMainForm();
             }
-
-            //var filesRemoved = duplicatesForm.FilesDeleted ?? Array.Empty<string>();
-            //_state.Files = _state.Files.Where(f => !filesRemoved.Contains(f.FullPath)).ToArray();
         }
 
         private void textBoxPattern_TextChanged(object sender, EventArgs e) {
@@ -271,6 +305,48 @@ namespace DiskExplorer
         private void toolStripDropDownButtonLoadAnalisys_Click(object sender, EventArgs e) {
             string filepath = OSHelper.OpenFile("analysis.json", "JSON | *.json");
             LoadScan(filepath);
+        }
+
+        private void listView1_MouseClick(object sender, MouseEventArgs e) {
+            if (e.Button == MouseButtons.Right) {
+                if (listView1.FocusedItem.Bounds.Contains(e.Location) == true) {
+                    contextMenuStrip1.Show(Cursor.Position);
+                }
+            }
+        }
+
+        private void toolStripMenuItemOpen_Click(object sender, EventArgs e) {
+            foreach (ListViewItem selectedItem in listView1.SelectedItems) {
+                string directory = selectedItem.SubItems[0].Text;
+                string fileName = selectedItem.SubItems[1].Text;
+                Process.Start(Path.Combine(directory, fileName));
+            }
+        }
+
+        private void toolStripMenuItemShowInFolder_Click(object sender, EventArgs e) {
+            foreach (ListViewItem selectedItem in listView1.SelectedItems) {
+                string directory = selectedItem.SubItems[0].Text;
+                string fileName = selectedItem.SubItems[1].Text;
+                Common.OpenFolderAndSelectFile(Path.Combine(directory, fileName));
+            }
+        }
+
+        private void listViewExplorer_MouseDoubleClick(object sender, MouseEventArgs e) {
+            string seceltion = listViewExplorer.SelectedItems[0].Text.Trim(new[] { '[', ' ', ']' });
+            if (seceltion == "..") {
+                string parentFolderPath = Directory.GetParent(_state.CurrentlyExploringFolder.Path).FullName;
+                _state.CurrentlyExploringFolder = new[] { _state.Folder }
+                    .Concat(_state.Folder.Subfolders.Flatten(f => f.Subfolders))
+                    .Single(f => f.Path == parentFolderPath);
+            } else {
+                if (File.GetAttributes(seceltion).HasFlag(FileAttributes.Directory)) {
+                    _state.CurrentlyExploringFolder = _state.CurrentlyExploringFolder.Subfolders.Single(f => f.Path == seceltion);
+                } else { // file?
+                    Process.Start(seceltion);
+                    return;
+                }                    
+            }
+            SetExplorerTab();
         }
     }
 }

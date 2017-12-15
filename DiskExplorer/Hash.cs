@@ -3,10 +3,8 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace DiskExplorer
-{
-	public class Hash
-	{
+namespace DiskExplorer {
+	public class Hash {
         public static long MaxBufLengthPerCore = 134217728;//2147483648 / Environment.ProcessorCount;
         // 134217728 100 Mb  536870912 512 Mb  1073741824 1 Gb  2147483648 2 Gb - max VirtualMemory at .net 4.7  27.08.2017 18:04 GMT+3
         // https://stackoverflow.com/questions/12416249/hashing-a-string-with-sha256
@@ -22,6 +20,26 @@ namespace DiskExplorer
                 byte[] hash = hashstring.ComputeHash(fileStream);
                 return BytesToHex(hash);
             }
+        }
+
+        public static string GetMD5(string filePath) {
+            using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
+                var md5 = MD5.Create();
+                byte[] hash = md5.ComputeHash(fileStream);
+                return BytesToHex(hash);
+            }
+        }
+
+        // https://stackoverflow.com/questions/9545619/a-fast-hash-function-for-string-in-c-sharp
+        public static string KnuthHash(string filePath) {
+            ulong hashedValue = 3074457345618258791ul;
+            using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
+                while (fileStream.Position < filePath.Length) {
+                    hashedValue += (ulong)fileStream.ReadByte();
+                    hashedValue *= 3074457345618258799ul;                    
+                }
+            }
+            return hashedValue.ToString();
         }
 
         public static string GetFileHash(string filePath) {

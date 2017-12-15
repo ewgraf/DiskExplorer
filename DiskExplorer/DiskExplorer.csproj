@@ -77,8 +77,10 @@
     <Compile Include="Entities\FileInfoExtended.cs" />
     <Compile Include="Entities\PauseToken.cs" />
     <Compile Include="Entities\State.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Explorer.cs" />
     <Compile Include="FileUtils.cs" />
+    <Compile Include="Folder.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -92,6 +94,9 @@
       <DependentUpon>DuplicatesForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Hash.cs" />
+    <Compile Include="ListView2.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ListViewColumnSorter.cs" />
     <Compile Include="ListViewExtensons.cs" />
     <Compile Include="LoadStateForm.cs">
