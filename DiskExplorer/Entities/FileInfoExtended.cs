@@ -86,12 +86,16 @@ namespace DiskExplorer.Entities {
                 throw new ArgumentNullException(nameof(root));
             }
 
-            List<Folder> folders = new[] { root }.ToList();
-            for (int i = 0; i < folders.Count; i++) {
-                folders[i].Files = ComputeHashesParallel(folders[i].Files, toUpdate, progress, cancellationTokenSource);
-                folders.AddRange(folders[i].Subfolders);
-            }
-            return folders[0];
+            ComputeHashesParallel(
+                root.GetAllFiles()
+                    .OrderByDescending(f => f.Length)
+                    .ToArray(),
+                toUpdate,
+                progress,
+                cancellationTokenSource
+            );
+
+            return root;
         }
     }
 }
