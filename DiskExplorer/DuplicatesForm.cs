@@ -9,8 +9,7 @@ using Microsoft.VisualBasic.FileIO;
 using DiskExplorer.Entities;
 using System.Text.RegularExpressions;
 
-namespace DiskExplorer
-{
+namespace DiskExplorer {
     public partial class DuplicatesForm : Form {
         private string _folderName;
         private string _fontName = "Consolas";
@@ -111,7 +110,7 @@ namespace DiskExplorer
                 try {
                     preview?.Dispose();
                     preview = null;
-                    preview = new Bitmap(Path.Combine(folder, filename));
+                    preview = (Bitmap)FromFile(Path.Combine(folder, filename));
                 } catch {
                     preview = null;
                 } finally {
@@ -124,6 +123,13 @@ namespace DiskExplorer
                     richTextBox1.Text = File.ReadLines(Path.Combine(folder, filename)).Take(42).Aggregate((text, nextLine) => text += $"{nextLine}{Environment.NewLine}");
                 } catch { }
             }
+        }
+
+        public static Image FromFile(string path) {
+            var bytes = File.ReadAllBytes(path);
+            var ms = new MemoryStream(bytes);
+            var img = Image.FromStream(ms);
+            return img;
         }
 
         private void deleteButton_Click(object sender, EventArgs e) {
