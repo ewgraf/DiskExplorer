@@ -222,7 +222,9 @@ namespace DiskExplorer
                 listView1.Items.AddRange(items);
                 (listView1.ListViewItemSorter as ListViewColumnSorter).SortColumn = 2; // "Size" column
                 listView1.Sort();
-                listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                //listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                int[] averageTextLengths = GetAverageColumnTextLength(listView1.Items);
+                SetColumnsWidth(listView1, averageTextLengths);
             }
             listView1.EndUpdate();
 
@@ -246,9 +248,29 @@ namespace DiskExplorer
                 listViewExplorer.Items.AddRange(fileItems);
                 //(listViewExplorer.ListViewItemSorter as ListViewColumnSorter).SortColumn = 1; // "Size" column
                 //listViewExplorer.Sort();
-                listViewExplorer.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                //listViewExplorer.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                int[] averageTextLengths = GetAverageColumnTextLength(listViewExplorer.Items);
+                SetColumnsWidth(listViewExplorer, averageTextLengths);
             }
             listViewExplorer.EndUpdate();
+        }
+
+        private int[] GetAverageColumnTextLength(ListView.ListViewItemCollection items) {
+            int columnsCount = items[0].SubItems.Count;
+            int[] averages = new int[columnsCount];
+            for (int i = 0; i < columnsCount; i++) {
+                foreach (ListViewItem item in items) {
+                    averages[i] += item.SubItems[i].Text.Length;
+                }
+                averages[i] /= items.Count;
+            }
+            return averages;
+        }
+
+        private void SetColumnsWidth(ListView listViewExplorer, int[] averageTextLengths) {
+            for (int i = 0; i < listViewExplorer.Columns.Count; i++) {
+                listViewExplorer.Columns[i].Width = (int)((averageTextLengths[i] + 3) * this.Font.Size); // just added 3 pixels to make look pretty (prevent folding in Size column)
+            }
         }
 
         private void buttonDiscover_Click(object sender, EventArgs e) {
