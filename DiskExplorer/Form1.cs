@@ -354,17 +354,17 @@ namespace DiskExplorer
         }
 
         private void listViewExplorer_MouseDoubleClick(object sender, MouseEventArgs e) {
-            string seceltion = listViewExplorer.SelectedItems[0].Text.Trim(new[] { '[', ' ', ']' });
-            if (seceltion == "..") {
+            string selection = listViewExplorer.SelectedItems[0].Text.Trim(new[] { '[', ' ', ']' });
+            if (selection == "..") {
                 string parentFolderPath = Directory.GetParent(_state.CurrentlyExploringFolder.Path).FullName;
                 _state.CurrentlyExploringFolder = new[] { _state.Folder }
                     .Concat(_state.Folder.Subfolders.Flatten(f => f.Subfolders))
                     .Single(f => f.Path == parentFolderPath);
             } else {
-                if (File.GetAttributes(seceltion).HasFlag(FileAttributes.Directory)) {
-                    _state.CurrentlyExploringFolder = _state.CurrentlyExploringFolder.Subfolders.Single(f => f.Path == seceltion);
+                if (File.GetAttributes(selection).HasFlag(FileAttributes.Directory)) {
+                    _state.CurrentlyExploringFolder = _state.CurrentlyExploringFolder.Subfolders.Single(f => f.Path == selection);
                 } else { // file?
-                    Process.Start(seceltion);
+                    Process.Start(selection);
                     return;
                 }                    
             }

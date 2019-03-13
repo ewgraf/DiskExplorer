@@ -6,8 +6,8 @@ using DiskExplorer.Entities;
 
 namespace DiskExplorer {
     public partial class DiscoverForm : Form {
-        private static double GB = Math.Pow(2, 30);
-        private readonly static object share = new object();
+        private static readonly double GB = Math.Pow(2, 30);
+        private static readonly object Share = new object();
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly Explorer _explorer = new Explorer();
         private readonly string _folder;
@@ -43,7 +43,7 @@ namespace DiskExplorer {
             });
             long filesSizeDiscovered = 0;
             _scanProgress = new Progress<(FileInfoExtended, TimeSpan, long, string)>(value => {
-                lock (share) {
+                lock (Share) {
                     if (!_toUpdateScan) {
                         return;
                     }
@@ -73,7 +73,7 @@ namespace DiskExplorer {
 
         private bool _toUpdateDiscover = true;
         private bool _toUpdateScan = true;
-        private static bool _scanComplete = false;
+        private static bool _scanComplete;
 
         private async void DiscoverForm_Load(object sender, EventArgs e) {
             this.progressTimer.Start();
@@ -104,12 +104,12 @@ namespace DiskExplorer {
             //    _scanProgress,
             //    _cancellationTokenSource
             //));
-            _progress.Of = this.Root.FilesTotal;
-            this.Root = await Task.Run(() => this.Root.ComputeHashesParallel(
-                () => _toUpdateScan,
-                _scanProgress,
-                _cancellationTokenSource
-            ));
+            //_progress.Of = this.Root.FilesTotal;
+            //this.Root = await Task.Run(() => this.Root.ComputeHashesParallel(
+            //    () => _toUpdateScan,
+            //    _scanProgress,
+            //    _cancellationTokenSource
+            //));
             this.progressTimer.Stop();
             this.DialogResult = DialogResult.OK;
             this.Close();

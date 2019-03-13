@@ -42,16 +42,14 @@ namespace DiskExplorer {
         public Folder GetFilesTree(string folder, string pattern, Func<bool> toUpdate = null, IProgress<(int, long, string)> progress = null, /*PauseToken pauseToken = null, */CancellationTokenSource token = null) {
             int filesDiscovered = 0;
             long filesSizeDiscovered = 0;
-            List<string> directories = new[] { folder }.ToList();
-
             List<Folder> folders = new[] { new Folder { Path = folder } }.ToList();
             for (int i = 0; i < folders.Count; i++) {
                 FileInfoExtended[] files = GetFilesOrDefault(folders[i].Path, pattern)
-                        .Select(filePath => { try { return new FileInfoExtended(filePath); } catch { return null; } })
-                        .Where(fi => fi != null)
-                        .ToArray();
+						.Select(filePath => { try { return new FileInfoExtended(filePath); } catch { return null; } })
+						.Where(fi => fi != null)
+						.ToArray();
                 Folder[] subfolders = GetDirectoriesOrDefault(folders[i].Path)
-                    .Select(d => new Folder { Path = d })
+					.Select(s => new Folder { Path = s })
                     .ToArray();
                 folders[i].Files = files;
                 folders[i].Subfolders = subfolders;
@@ -66,26 +64,30 @@ namespace DiskExplorer {
             for (int i = folders.Count - 1; i >= 0; i--) {
                 folders[i].Size = folders[i].Subfolders.Sum(f => f.Size) + folders[i].Files.Sum(f => f.Length);
             }
-            if (progress != null) {
-                progress.Report((filesDiscovered, filesSizeDiscovered, folders.Where(f => f.Files.Any()).Last().Files.Last().FullPath));
-            }
+            progress?.Report((filesDiscovered, filesSizeDiscovered, folders.Last(f => f.Files.Any()).Files.Last().FullPath));
             Folder root = folders[0];
             root.FilesTotal = filesDiscovered;
             return root;
         }
 
-        public string[] GetFilesOrDefault(string folder, string searchPattern, SearchOption searchOption = SearchOption.TopDirectoryOnly) {
+        public string[] GetFilesOrDefault(string folderPath, string searchPattern, SearchOption searchOption = SearchOption.TopDirectoryOnly) {
             try {
-                return Directory.GetFiles(folder, searchPattern, searchOption);
+	            if (folderPath.Length >= 260) {
+		            return Array.Empty<string>();
+	            }
+				return Directory.GetFiles(folderPath, searchPattern, searchOption);
             } catch (UnauthorizedAccessException ex) {
                 // Log.Warn Отказано в пути
                 return Array.Empty<string>();
             }
         }
 
-        public string[] GetDirectoriesOrDefault(string folder, SearchOption searchOption = SearchOption.TopDirectoryOnly) {
+        public string[] GetDirectoriesOrDefault(string folderPath, SearchOption searchOption = SearchOption.TopDirectoryOnly) {
             try {
-                return Directory.GetDirectories(folder);
+	            if (folderPath.Length >= 260) {
+		            return Array.Empty<string>();
+	            }
+                return Directory.GetDirectories(folderPath);
             } catch (UnauthorizedAccessException ex) {
                 return Array.Empty<string>();
             }
