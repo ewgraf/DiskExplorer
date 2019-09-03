@@ -99,18 +99,18 @@ namespace DiskExplorer {
             this.scanGroupBox.Enabled = true;
             this.discoveringProgressBar.Style = ProgressBarStyle.Blocks;
             this.scanProgressBar.Maximum = this.Root.FilesTotal;
-            //this.Files = await Task.Run(() => Files.ComputeHashesParallel(
-            //    () => _toUpdateScan,
-            //    _scanProgress,
-            //    _cancellationTokenSource
-            //));
-            //_progress.Of = this.Root.FilesTotal;
-            //this.Root = await Task.Run(() => this.Root.ComputeHashesParallel(
-            //    () => _toUpdateScan,
-            //    _scanProgress,
-            //    _cancellationTokenSource
-            //));
-            this.progressTimer.Stop();
+			//this.Files = await Task.Run(() => Files.ComputeHashesParallel(
+			//	() => _toUpdateScan,
+			//	_scanProgress,
+			//	_cancellationTokenSource
+			//));
+			_progress.Of = this.Root.FilesTotal;
+			this.Root = await Task.Run(() => this.Root.ComputeHashesParallel(
+				() => _toUpdateScan,
+				_scanProgress,
+				_cancellationTokenSource
+			));
+			this.progressTimer.Stop();
             this.DialogResult = DialogResult.OK;
             this.Close();
             _scanComplete = true;

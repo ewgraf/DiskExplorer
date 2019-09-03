@@ -11,7 +11,6 @@ using System.Text.RegularExpressions;
 
 namespace DiskExplorer {
     public partial class DuplicatesForm : Form {
-        private string _folderName;
         private string _fontName = "Consolas";
         private float  _fontSize = 9.5f;
         private Bitmap preview = null;
@@ -24,8 +23,8 @@ namespace DiskExplorer {
             if (predicate != null) {
                 result = result.Where(predicate).ToArray();
             }
-            return result.GroupBy(g => g.Hash)
-               .ToDictionary(g => g.Key, g => g.OrderByDescending(i => i.FullPath.Length).ToList())
+			var groups = result.GroupBy(g => g.Hash).ToArray();
+			return groups.ToDictionary(g => g.Key, g => g.OrderByDescending(i => i.FullPath.Length).ToList())
                .Where(p => p.Value.Count > 1)
                .OrderByDescending(g => g.Value.First().Length)
                .ToDictionary(g => g.Key, g => g.Value);
@@ -202,5 +201,49 @@ namespace DiskExplorer {
                 Common.OpenFolderAndSelectFile(Path.Combine(directory, fileName));
             }
         }
-    }
+
+		private void buttonSelectDeepest_Click(object sender, EventArgs e) {
+			Dictionary<string, List<FileInfoExtended>> duplicates = GroupDuplicates(_folder);
+			listView1.BeginUpdate();
+			listView1.Clear();
+			listView1.Columns.Clear();
+			listView1.Columns.AddRange(Form1.Columns.Select(c => new ColumnHeader { Name = c, Text = c }).ToArray());
+			listView1.FullRowSelect = true;
+			bool coloriseGroup = true;
+			foreach (var duplicate in duplicates) {
+				ListViewItem[] items = duplicate.Value
+					.Select(f => {
+						var item = new ListViewItem(new string[] {
+								f.DirectoryName,
+								f.Name,
+								f.CreationTime.ToShortDateString(),
+								f.LastWriteTime.ToShortDateString(),
+								f.SizeWithPrefix(),
+								f.Hash
+							});
+						if (f.Name.EndsWith("asm")) {
+							;
+						}
+						if (coloriseGroup) {
+							item.BackColor = SystemColors.Control;
+						}
+						return item;
+					})
+					.ToArray();
+				duplicate.Value.Select((d, i) => new { IndexOfItem = i, Item = d })
+					.OrderBy(d => d.Item.DirectoryName.Length)
+					.Take(items.Length - 1)
+					.ToList()
+					.ForEach(d => items[d.IndexOfItem].Checked = true);
+				coloriseGroup = !coloriseGroup;
+				listView1.Items.AddRange(items);
+			}
+			listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+			listView1.Focus();
+			if (listView1.Items.Count != 0) {
+				listView1.Items[0].Selected = true;
+			}
+			listView1.EndUpdate();
+		}
+	}
 }

@@ -281,7 +281,7 @@ namespace DiskExplorer
             var dialogResult = discoverForm.ShowDialog();
             stopwatch.Stop();
 
-            if(dialogResult == DialogResult.OK) {
+            if (dialogResult == DialogResult.OK) {
                 _state.Folder = discoverForm.Root;
                 _state.CurrentlyExploringFolder = _state.Folder;
                 SaveState();
