@@ -56,6 +56,9 @@
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.toolStripMenuItemOpen = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItemShowInFolder = new System.Windows.Forms.ToolStripMenuItem();
+			this.tabControl2 = new System.Windows.Forms.TabControl();
+			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.tabPage2 = new System.Windows.Forms.TabPage();
 			this.statusStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -64,6 +67,8 @@
 			this.tabPageAllFiles.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.contextMenuStrip1.SuspendLayout();
+			this.tabControl2.SuspendLayout();
+			this.tabPage1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// listView1
@@ -73,6 +78,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.listView1.FullRowSelect = true;
 			this.listView1.GridLines = true;
+			this.listView1.HideSelection = false;
 			this.listView1.Location = new System.Drawing.Point(0, 2);
 			this.listView1.Name = "listView1";
 			this.listView1.Size = new System.Drawing.Size(838, 336);
@@ -93,7 +99,7 @@
             this.toolStripStatusLabel1});
 			this.statusStrip1.Location = new System.Drawing.Point(0, 539);
 			this.statusStrip1.Name = "statusStrip1";
-			this.statusStrip1.Size = new System.Drawing.Size(884, 22);
+			this.statusStrip1.Size = new System.Drawing.Size(1379, 22);
 			this.statusStrip1.TabIndex = 3;
 			this.statusStrip1.Text = "statusStrip1";
 			// 
@@ -179,9 +185,9 @@
 			// 
 			this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textBox1.Location = new System.Drawing.Point(6, 18);
+			this.textBox1.Location = new System.Drawing.Point(425, 55);
 			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(651, 20);
+			this.textBox1.Size = new System.Drawing.Size(474, 20);
 			this.textBox1.TabIndex = 4;
 			this.textBox1.Text = "C:\\";
 			this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
@@ -189,9 +195,9 @@
 			// button1
 			// 
 			this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.button1.Location = new System.Drawing.Point(663, 16);
+			this.button1.Location = new System.Drawing.Point(65, 98);
 			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(113, 24);
+			this.button1.Size = new System.Drawing.Size(301, 179);
 			this.button1.TabIndex = 5;
 			this.button1.Text = "Select folder...";
 			this.button1.UseVisualStyleBackColor = true;
@@ -199,14 +205,10 @@
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox1.Controls.Add(this.button2);
-			this.groupBox1.Controls.Add(this.textBox1);
-			this.groupBox1.Controls.Add(this.button1);
 			this.groupBox1.Location = new System.Drawing.Point(12, 12);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(860, 44);
+			this.groupBox1.Size = new System.Drawing.Size(372, 44);
 			this.groupBox1.TabIndex = 6;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Select path";
@@ -214,7 +216,7 @@
 			// button2
 			// 
 			this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.button2.Location = new System.Drawing.Point(782, 16);
+			this.button2.Location = new System.Drawing.Point(294, 16);
 			this.button2.Name = "button2";
 			this.button2.Size = new System.Drawing.Size(72, 24);
 			this.button2.TabIndex = 0;
@@ -234,16 +236,13 @@
 			// 
 			// groupBox2
 			// 
-			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox2.Controls.Add(this.tabControl1);
 			this.groupBox2.Controls.Add(this.label1);
 			this.groupBox2.Controls.Add(this.buttonFindDuplicates);
 			this.groupBox2.Controls.Add(this.buttonDiscover);
 			this.groupBox2.Location = new System.Drawing.Point(12, 116);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(860, 420);
+			this.groupBox2.Size = new System.Drawing.Size(372, 420);
 			this.groupBox2.TabIndex = 9;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Analyze";
@@ -258,7 +257,7 @@
 			this.tabControl1.Location = new System.Drawing.Point(6, 49);
 			this.tabControl1.Name = "tabControl1";
 			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(848, 365);
+			this.tabControl1.Size = new System.Drawing.Size(360, 365);
 			this.tabControl1.TabIndex = 15;
 			// 
 			// tabPageExplorer
@@ -267,7 +266,7 @@
 			this.tabPageExplorer.Location = new System.Drawing.Point(4, 22);
 			this.tabPageExplorer.Name = "tabPageExplorer";
 			this.tabPageExplorer.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPageExplorer.Size = new System.Drawing.Size(840, 339);
+			this.tabPageExplorer.Size = new System.Drawing.Size(352, 339);
 			this.tabPageExplorer.TabIndex = 0;
 			this.tabPageExplorer.Text = "Explorer";
 			this.tabPageExplorer.UseVisualStyleBackColor = true;
@@ -277,9 +276,10 @@
 			this.listViewExplorer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.listViewExplorer.HideSelection = false;
 			this.listViewExplorer.Location = new System.Drawing.Point(0, 2);
 			this.listViewExplorer.Name = "listViewExplorer";
-			this.listViewExplorer.Size = new System.Drawing.Size(838, 336);
+			this.listViewExplorer.Size = new System.Drawing.Size(350, 336);
 			this.listViewExplorer.TabIndex = 0;
 			this.listViewExplorer.UseCompatibleStateImageBehavior = false;
 			this.listViewExplorer.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listViewExplorer_MouseDoubleClick);
@@ -320,19 +320,17 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textBoxPattern.Location = new System.Drawing.Point(6, 19);
 			this.textBoxPattern.Name = "textBoxPattern";
-			this.textBoxPattern.Size = new System.Drawing.Size(848, 20);
+			this.textBoxPattern.Size = new System.Drawing.Size(360, 20);
 			this.textBoxPattern.TabIndex = 6;
 			this.textBoxPattern.Text = "*";
 			this.textBoxPattern.TextChanged += new System.EventHandler(this.textBoxPattern_TextChanged);
 			// 
 			// groupBox3
 			// 
-			this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox3.Controls.Add(this.textBoxPattern);
 			this.groupBox3.Location = new System.Drawing.Point(12, 62);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(860, 48);
+			this.groupBox3.Size = new System.Drawing.Size(372, 48);
 			this.groupBox3.TabIndex = 10;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "With pattern";
@@ -359,11 +357,46 @@
 			this.toolStripMenuItemShowInFolder.Text = "Показать в папке...";
 			this.toolStripMenuItemShowInFolder.Click += new System.EventHandler(this.toolStripMenuItemShowInFolder_Click);
 			// 
+			// tabControl2
+			// 
+			this.tabControl2.Alignment = System.Windows.Forms.TabAlignment.Left;
+			this.tabControl2.Controls.Add(this.tabPage1);
+			this.tabControl2.Controls.Add(this.tabPage2);
+			this.tabControl2.Location = new System.Drawing.Point(425, 81);
+			this.tabControl2.Multiline = true;
+			this.tabControl2.Name = "tabControl2";
+			this.tabControl2.SelectedIndex = 0;
+			this.tabControl2.Size = new System.Drawing.Size(478, 392);
+			this.tabControl2.TabIndex = 11;
+			// 
+			// tabPage1
+			// 
+			this.tabPage1.Controls.Add(this.button1);
+			this.tabPage1.Location = new System.Drawing.Point(23, 4);
+			this.tabPage1.Name = "tabPage1";
+			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage1.Size = new System.Drawing.Size(451, 384);
+			this.tabPage1.TabIndex = 0;
+			this.tabPage1.Text = "tabPage1";
+			this.tabPage1.UseVisualStyleBackColor = true;
+			// 
+			// tabPage2
+			// 
+			this.tabPage2.Location = new System.Drawing.Point(23, 4);
+			this.tabPage2.Name = "tabPage2";
+			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+			this.tabPage2.Size = new System.Drawing.Size(451, 384);
+			this.tabPage2.TabIndex = 1;
+			this.tabPage2.Text = "tabPage2";
+			this.tabPage2.UseVisualStyleBackColor = true;
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(884, 561);
+			this.ClientSize = new System.Drawing.Size(1379, 561);
+			this.Controls.Add(this.tabControl2);
+			this.Controls.Add(this.textBox1);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
@@ -376,7 +409,6 @@
 			this.statusStrip1.ResumeLayout(false);
 			this.statusStrip1.PerformLayout();
 			this.groupBox1.ResumeLayout(false);
-			this.groupBox1.PerformLayout();
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
 			this.tabControl1.ResumeLayout(false);
@@ -385,6 +417,8 @@
 			this.groupBox3.ResumeLayout(false);
 			this.groupBox3.PerformLayout();
 			this.contextMenuStrip1.ResumeLayout(false);
+			this.tabControl2.ResumeLayout(false);
+			this.tabPage1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -418,6 +452,9 @@
         private System.Windows.Forms.TabPage tabPageExplorer;
         private System.Windows.Forms.TabPage tabPageAllFiles;
         private System.Windows.Forms.ListView listViewExplorer;
-    }
+		private System.Windows.Forms.TabControl tabControl2;
+		private System.Windows.Forms.TabPage tabPage1;
+		private System.Windows.Forms.TabPage tabPage2;
+	}
 }
 
