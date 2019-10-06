@@ -40,35 +40,27 @@
 			this.toolStripDropDownButtonSeparator2 = new System.Windows.Forms.ToolStripDropDownButton();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.textBox1 = new System.Windows.Forms.TextBox();
-			this.button1 = new System.Windows.Forms.Button();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.button2 = new System.Windows.Forms.Button();
 			this.buttonDiscover = new System.Windows.Forms.Button();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPageExplorer = new System.Windows.Forms.TabPage();
 			this.listViewExplorer = new System.Windows.Forms.ListView();
 			this.tabPageAllFiles = new System.Windows.Forms.TabPage();
-			this.label1 = new System.Windows.Forms.Label();
 			this.buttonFindDuplicates = new System.Windows.Forms.Button();
 			this.textBoxPattern = new System.Windows.Forms.TextBox();
-			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.toolStripMenuItemOpen = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItemShowInFolder = new System.Windows.Forms.ToolStripMenuItem();
-			this.tabControl2 = new System.Windows.Forms.TabControl();
-			this.tabPage1 = new System.Windows.Forms.TabPage();
-			this.tabPage2 = new System.Windows.Forms.TabPage();
+			this.label2 = new System.Windows.Forms.Label();
+			this.label3 = new System.Windows.Forms.Label();
 			this.statusStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.tabPageExplorer.SuspendLayout();
 			this.tabPageAllFiles.SuspendLayout();
-			this.groupBox3.SuspendLayout();
 			this.contextMenuStrip1.SuspendLayout();
-			this.tabControl2.SuspendLayout();
-			this.tabPage1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// listView1
@@ -81,7 +73,7 @@
 			this.listView1.HideSelection = false;
 			this.listView1.Location = new System.Drawing.Point(0, 2);
 			this.listView1.Name = "listView1";
-			this.listView1.Size = new System.Drawing.Size(838, 336);
+			this.listView1.Size = new System.Drawing.Size(669, 381);
 			this.listView1.TabIndex = 1;
 			this.listView1.UseCompatibleStateImageBehavior = false;
 			this.listView1.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView1_ColumnClick);
@@ -99,7 +91,7 @@
             this.toolStripStatusLabel1});
 			this.statusStrip1.Location = new System.Drawing.Point(0, 539);
 			this.statusStrip1.Name = "statusStrip1";
-			this.statusStrip1.Size = new System.Drawing.Size(1379, 22);
+			this.statusStrip1.Size = new System.Drawing.Size(720, 22);
 			this.statusStrip1.TabIndex = 3;
 			this.statusStrip1.Text = "statusStrip1";
 			// 
@@ -185,48 +177,30 @@
 			// 
 			this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textBox1.Location = new System.Drawing.Point(425, 55);
+			this.textBox1.Location = new System.Drawing.Point(10, 16);
 			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(474, 20);
+			this.textBox1.Size = new System.Drawing.Size(333, 20);
 			this.textBox1.TabIndex = 4;
 			this.textBox1.Text = "C:\\";
 			this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
-			// 
-			// button1
-			// 
-			this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.button1.Location = new System.Drawing.Point(65, 98);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(301, 179);
-			this.button1.TabIndex = 5;
-			this.button1.Text = "Select folder...";
-			this.button1.UseVisualStyleBackColor = true;
-			this.button1.Click += new System.EventHandler(this.button1_Click);
+			this.textBox1.DoubleClick += new System.EventHandler(this.textBox1_DoubleClick);
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Controls.Add(this.button2);
-			this.groupBox1.Location = new System.Drawing.Point(12, 12);
+			this.groupBox1.Controls.Add(this.textBoxPattern);
+			this.groupBox1.Controls.Add(this.textBox1);
+			this.groupBox1.Controls.Add(this.label3);
+			this.groupBox1.Controls.Add(this.label2);
+			this.groupBox1.Location = new System.Drawing.Point(145, 12);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(372, 44);
+			this.groupBox1.Size = new System.Drawing.Size(415, 54);
 			this.groupBox1.TabIndex = 6;
 			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "Select path";
-			// 
-			// button2
-			// 
-			this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.button2.Location = new System.Drawing.Point(294, 16);
-			this.button2.Name = "button2";
-			this.button2.Size = new System.Drawing.Size(72, 24);
-			this.button2.TabIndex = 0;
-			this.button2.Text = "Explore";
-			this.button2.UseVisualStyleBackColor = true;
-			this.button2.Click += new System.EventHandler(this.button2_Click);
+			this.groupBox1.Text = "Select folder to discover && scan";
 			// 
 			// buttonDiscover
 			// 
-			this.buttonDiscover.Location = new System.Drawing.Point(6, 19);
+			this.buttonDiscover.Location = new System.Drawing.Point(144, 72);
 			this.buttonDiscover.Name = "buttonDiscover";
 			this.buttonDiscover.Size = new System.Drawing.Size(222, 24);
 			this.buttonDiscover.TabIndex = 7;
@@ -237,12 +211,9 @@
 			// groupBox2
 			// 
 			this.groupBox2.Controls.Add(this.tabControl1);
-			this.groupBox2.Controls.Add(this.label1);
-			this.groupBox2.Controls.Add(this.buttonFindDuplicates);
-			this.groupBox2.Controls.Add(this.buttonDiscover);
-			this.groupBox2.Location = new System.Drawing.Point(12, 116);
+			this.groupBox2.Location = new System.Drawing.Point(12, 102);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(372, 420);
+			this.groupBox2.Size = new System.Drawing.Size(689, 434);
 			this.groupBox2.TabIndex = 9;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Analyze";
@@ -254,10 +225,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tabControl1.Controls.Add(this.tabPageExplorer);
 			this.tabControl1.Controls.Add(this.tabPageAllFiles);
-			this.tabControl1.Location = new System.Drawing.Point(6, 49);
+			this.tabControl1.Location = new System.Drawing.Point(6, 19);
 			this.tabControl1.Name = "tabControl1";
 			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(360, 365);
+			this.tabControl1.Size = new System.Drawing.Size(677, 409);
 			this.tabControl1.TabIndex = 15;
 			// 
 			// tabPageExplorer
@@ -266,7 +237,7 @@
 			this.tabPageExplorer.Location = new System.Drawing.Point(4, 22);
 			this.tabPageExplorer.Name = "tabPageExplorer";
 			this.tabPageExplorer.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPageExplorer.Size = new System.Drawing.Size(352, 339);
+			this.tabPageExplorer.Size = new System.Drawing.Size(669, 383);
 			this.tabPageExplorer.TabIndex = 0;
 			this.tabPageExplorer.Text = "Explorer";
 			this.tabPageExplorer.UseVisualStyleBackColor = true;
@@ -279,7 +250,7 @@
 			this.listViewExplorer.HideSelection = false;
 			this.listViewExplorer.Location = new System.Drawing.Point(0, 2);
 			this.listViewExplorer.Name = "listViewExplorer";
-			this.listViewExplorer.Size = new System.Drawing.Size(350, 336);
+			this.listViewExplorer.Size = new System.Drawing.Size(667, 380);
 			this.listViewExplorer.TabIndex = 0;
 			this.listViewExplorer.UseCompatibleStateImageBehavior = false;
 			this.listViewExplorer.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listViewExplorer_MouseDoubleClick);
@@ -290,23 +261,14 @@
 			this.tabPageAllFiles.Location = new System.Drawing.Point(4, 22);
 			this.tabPageAllFiles.Name = "tabPageAllFiles";
 			this.tabPageAllFiles.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPageAllFiles.Size = new System.Drawing.Size(840, 339);
+			this.tabPageAllFiles.Size = new System.Drawing.Size(669, 383);
 			this.tabPageAllFiles.TabIndex = 1;
 			this.tabPageAllFiles.Text = "All files";
 			this.tabPageAllFiles.UseVisualStyleBackColor = true;
 			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(234, 25);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(13, 13);
-			this.label1.TabIndex = 14;
-			this.label1.Text = "|";
-			// 
 			// buttonFindDuplicates
 			// 
-			this.buttonFindDuplicates.Location = new System.Drawing.Point(253, 19);
+			this.buttonFindDuplicates.Location = new System.Drawing.Point(373, 72);
 			this.buttonFindDuplicates.Name = "buttonFindDuplicates";
 			this.buttonFindDuplicates.Size = new System.Drawing.Size(109, 24);
 			this.buttonFindDuplicates.TabIndex = 13;
@@ -316,24 +278,13 @@
 			// 
 			// textBoxPattern
 			// 
-			this.textBoxPattern.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.textBoxPattern.Location = new System.Drawing.Point(6, 19);
+			this.textBoxPattern.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.textBoxPattern.Location = new System.Drawing.Point(349, 16);
 			this.textBoxPattern.Name = "textBoxPattern";
-			this.textBoxPattern.Size = new System.Drawing.Size(360, 20);
+			this.textBoxPattern.Size = new System.Drawing.Size(49, 20);
 			this.textBoxPattern.TabIndex = 6;
 			this.textBoxPattern.Text = "*";
 			this.textBoxPattern.TextChanged += new System.EventHandler(this.textBoxPattern_TextChanged);
-			// 
-			// groupBox3
-			// 
-			this.groupBox3.Controls.Add(this.textBoxPattern);
-			this.groupBox3.Location = new System.Drawing.Point(12, 62);
-			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(372, 48);
-			this.groupBox3.TabIndex = 10;
-			this.groupBox3.TabStop = false;
-			this.groupBox3.Text = "With pattern";
 			// 
 			// contextMenuStrip1
 			// 
@@ -357,48 +308,33 @@
 			this.toolStripMenuItemShowInFolder.Text = "Показать в папке...";
 			this.toolStripMenuItemShowInFolder.Click += new System.EventHandler(this.toolStripMenuItemShowInFolder_Click);
 			// 
-			// tabControl2
+			// label2
 			// 
-			this.tabControl2.Alignment = System.Windows.Forms.TabAlignment.Left;
-			this.tabControl2.Controls.Add(this.tabPage1);
-			this.tabControl2.Controls.Add(this.tabPage2);
-			this.tabControl2.Location = new System.Drawing.Point(425, 81);
-			this.tabControl2.Multiline = true;
-			this.tabControl2.Name = "tabControl2";
-			this.tabControl2.SelectedIndex = 0;
-			this.tabControl2.Size = new System.Drawing.Size(478, 392);
-			this.tabControl2.TabIndex = 11;
+			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(349, 35);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(49, 13);
+			this.label2.TabIndex = 7;
+			this.label2.Text = "Pattern";
 			// 
-			// tabPage1
+			// label3
 			// 
-			this.tabPage1.Controls.Add(this.button1);
-			this.tabPage1.Location = new System.Drawing.Point(23, 4);
-			this.tabPage1.Name = "tabPage1";
-			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage1.Size = new System.Drawing.Size(451, 384);
-			this.tabPage1.TabIndex = 0;
-			this.tabPage1.Text = "tabPage1";
-			this.tabPage1.UseVisualStyleBackColor = true;
-			// 
-			// tabPage2
-			// 
-			this.tabPage2.Location = new System.Drawing.Point(23, 4);
-			this.tabPage2.Name = "tabPage2";
-			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage2.Size = new System.Drawing.Size(451, 384);
-			this.tabPage2.TabIndex = 1;
-			this.tabPage2.Text = "tabPage2";
-			this.tabPage2.UseVisualStyleBackColor = true;
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(10, 35);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(139, 13);
+			this.label3.TabIndex = 8;
+			this.label3.Text = "Double click to select";
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1379, 561);
-			this.Controls.Add(this.tabControl2);
-			this.Controls.Add(this.textBox1);
-			this.Controls.Add(this.groupBox3);
+			this.ClientSize = new System.Drawing.Size(720, 561);
+			this.Controls.Add(this.buttonFindDuplicates);
 			this.Controls.Add(this.groupBox2);
+			this.Controls.Add(this.buttonDiscover);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.statusStrip1);
 			this.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
@@ -409,16 +345,12 @@
 			this.statusStrip1.ResumeLayout(false);
 			this.statusStrip1.PerformLayout();
 			this.groupBox1.ResumeLayout(false);
+			this.groupBox1.PerformLayout();
 			this.groupBox2.ResumeLayout(false);
-			this.groupBox2.PerformLayout();
 			this.tabControl1.ResumeLayout(false);
 			this.tabPageExplorer.ResumeLayout(false);
 			this.tabPageAllFiles.ResumeLayout(false);
-			this.groupBox3.ResumeLayout(false);
-			this.groupBox3.PerformLayout();
 			this.contextMenuStrip1.ResumeLayout(false);
-			this.tabControl2.ResumeLayout(false);
-			this.tabPage1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -429,16 +361,12 @@
         private ListView2 listView1;
         private System.Windows.Forms.StatusStrip statusStrip1;
 		private System.Windows.Forms.TextBox textBox1;
-		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.GroupBox groupBox1;
-		private System.Windows.Forms.Button button2;
 		private System.Windows.Forms.Button buttonDiscover;
 		private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button buttonFindDuplicates;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.TextBox textBoxPattern;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButtonOld;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButtonNew;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButtonSaveAnalisysAs;
@@ -452,9 +380,8 @@
         private System.Windows.Forms.TabPage tabPageExplorer;
         private System.Windows.Forms.TabPage tabPageAllFiles;
         private System.Windows.Forms.ListView listViewExplorer;
-		private System.Windows.Forms.TabControl tabControl2;
-		private System.Windows.Forms.TabPage tabPage1;
-		private System.Windows.Forms.TabPage tabPage2;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Label label3;
 	}
 }
 

@@ -7,12 +7,15 @@ using DiskExplorer.Entities;
 namespace DiskExplorer {
     public partial class DiscoverForm : Form {
         private static readonly double GB = Math.Pow(2, 30);
-        private static readonly object Share = new object();
+        private static readonly object _lock = new object();
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly Explorer _explorer = new Explorer();
         private readonly string _folder;
         private readonly string _pattern;
-        private readonly IProgress<(int, long, string)> _discoveryProgress;
+		private bool _toUpdateDiscover = true;
+		private bool _toUpdateScan = true;
+		private static bool _scanComplete;
+		private readonly IProgress<(int, long, string)> _discoveryProgress;
         private readonly IProgress<(FileInfoExtended, TimeSpan, long, string)> _scanProgress;        
 
         public Folder Root { get; set; }
@@ -28,7 +31,6 @@ namespace DiskExplorer {
 
         public DiscoverForm(string folder, string pattern) {
             InitializeComponent();
-
             _folder = folder;
             _pattern = pattern;
             _progress = new HashProgress {
@@ -36,14 +38,13 @@ namespace DiskExplorer {
                 Of = 0
             };
             _discoveryProgress = new Progress<(int, long, string)>(value => {
-                this.filesDiscoveredLabel.Text = value.Item1.ToString();
-                this.sizeDiscoveredLabel.Text = $"{value.Item2 / GB: 0.##} GB";
+                this.filesDiscoveredLabel.Text = $"Files discodeved: {value.Item1.ToString()} | {value.Item2 / GB: 0.##} GB";
                 this.fileDiscoveringLabel.Text = value.Item3.ToString();
                 this._toUpdateDiscover = false;
             });
-            long filesSizeDiscovered = 0;
+            long sizeOfAllDiscoveredFiles = 0;
             _scanProgress = new Progress<(FileInfoExtended, TimeSpan, long, string)>(value => {
-                lock (Share) {
+                lock (_lock) {
                     if (!_toUpdateScan) {
                         return;
                     }
@@ -55,25 +56,18 @@ namespace DiskExplorer {
                         return;
                     }
                     FileInfoExtended f = value.Item1;
-                    filesSizeDiscovered += f.Length;
+					sizeOfAllDiscoveredFiles += f.Length;
                     TimeSpan scannedIn = value.Item2;
                     long threadId = value.Item3;
                     _progress.Hashed++;
-                    this.filesScannedLabel.Text = _progress.ToString();
-                    this.sizeScannedLabel.Text = FileUtils.SizeSuffix(filesSizeDiscovered).ToString();
-                    this.fileScanningLabel.Text = f.FullPath.ToString();
-                    this.currentFileSizeLabel.Text = f.SizeWithPrefix();
+                    this.filesScannedLabel.Text = $"Files scanned: {_progress.ToString()} | {FileUtils.SizeSuffix(sizeOfAllDiscoveredFiles).ToString()}";
+                    this.fileScanningLabel.Text = $"{f.SizeWithPrefix()} | {f.FullPath.ToString()}";
                     this.scanProgressBar.Value = _progress.Hashed;
                     this._toUpdateScan = false;
                     this.richTextBox1.Text = this.richTextBox1.Text.Insert(0, $"size: {f.SizeWithPrefix()}\tin: {scannedIn}\t{f.Name}{Environment.NewLine}");
-                    //Application.DoEvents();
                 }
             });
         }
-
-        private bool _toUpdateDiscover = true;
-        private bool _toUpdateScan = true;
-        private static bool _scanComplete;
 
         private async void DiscoverForm_Load(object sender, EventArgs e) {
             this.progressTimer.Start();
@@ -120,6 +114,9 @@ namespace DiskExplorer {
             _toUpdateDiscover = true;
             _toUpdateScan = true;
         }
-        private void cancelButton_Click(object sender, EventArgs e) => _cancellationTokenSource.Cancel();
-    }
+
+		private void cancelButton_Click(object sender, EventArgs e) {
+			_cancellationTokenSource.Cancel();
+		}
+	}
 }

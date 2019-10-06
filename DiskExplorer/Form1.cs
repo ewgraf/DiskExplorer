@@ -176,10 +176,6 @@ namespace DiskExplorer
             _state.SelectedFolder = textBox1.Text;
         }
 
-        private void button2_Click(object sender, EventArgs e) {
-            Process.Start(_state.SelectedFolder);
-        }
-
         private void LoadScan(string analisysPath = "analysis.json") {
             var loadStateForm = new LoadStateForm(analisysPath);
             var dialogResult = loadStateForm.ShowDialog();
@@ -370,5 +366,9 @@ namespace DiskExplorer
             }
             SetExplorerTab();
         }
-    }
+
+		private void textBox1_DoubleClick(object sender, EventArgs e) {
+			textBox1.Text = OSHelper.SelectFolder();
+		}
+	}
 }

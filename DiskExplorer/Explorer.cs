@@ -39,7 +39,7 @@ namespace DiskExplorer {
             }
         }
 
-        public Folder GetFilesTree(string folder, string pattern, Func<bool> toUpdate = null, IProgress<(int, long, string)> progress = null, /*PauseToken pauseToken = null, */CancellationTokenSource token = null) {
+        public Folder GetFilesTree(string folder, string pattern, Func<bool> toUpdate = null, IProgress<(int, long, string)> progress = null, CancellationTokenSource token = null) {
             int filesDiscovered = 0;
             long filesSizeDiscovered = 0;
             List<Folder> folders = new[] { new Folder { Path = folder } }.ToList();

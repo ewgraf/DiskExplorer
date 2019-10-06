@@ -41,8 +41,9 @@ namespace DiskExplorer {
 
         // https://stackoverflow.com/questions/14488796/does-net-provide-an-easy-way-convert-bytes-to-kb-mb-gb-etc
         public static string SizeSuffix(long value, int decimalPlaces = 1) {
-            if (value < 0) {
-                return "-" + SizeSuffix(-value); }
+			//if (value < 0) {
+			//	return "-" + SizeSuffix(-value);
+			//}
             if (value == 0) {
                 return "0 Bytes";
             }
@@ -64,7 +65,7 @@ namespace DiskExplorer {
             return string.Format("{0:n" + decimalPlaces + "} {1}", adjustedSize, SizeSuffixes[mag]);
         }
 
-        public static bool IsFileLocked(string filePath) {
+		public static bool IsFileLocked(string filePath) {
             FileStream stream = null;
             Exception ex = null;
             try {
