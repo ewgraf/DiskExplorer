@@ -1,0 +1,2 @@
+# DiskExplorer
+Duplicate files finder.
